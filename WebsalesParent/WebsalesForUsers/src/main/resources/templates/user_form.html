@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0,">
-	<title>Websales Control Panel</title>
+	<title>[[${pageTitle}]]</title>
 	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
 	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
@@ -73,13 +73,14 @@
 	</div>
 	
 	<div>
-		<h2>Manage Users | Create New User</h2>
+		<h2>Manage Users | [[${pageTitle}]]</h2>
 	</div>
 	
 	<div></div>
 	
 	<form th:action="@{/users/save}" method="post" style="max-width: 700x; margin: 0 auto"
 		 th:object="${user}" onsubmit="return checkEmailUnique(this)">
+		 <input type="hidden" th:field="*{id}" id="id">
 		<div class="border border-primary rounded p-3">
 			<div class="form-group row">
 				<label class="col-sm-4 col-form-label">E-mail</label>
@@ -105,7 +106,8 @@
 			<div class="form-group row">
 				<label class="col-sm-4 col-form-label">Password</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" th:field="*{password}" required>
+					<input type="password" class="form-control" th:field="*{password}" required th:if="${user.id == null}">
+					<input type="password" class="form-control" th:field="*{password}" th:if="${user.id != null}">
 				</div>
 			</div>
 			
@@ -126,7 +128,7 @@
 			<div class="form-group row">
 				<label class="col-sm-4 col-form-label">Enabled</label>
 				<div class="col-sm-8">
-					<input type="checkbox"  th:field="*{enabled}" required >
+					<input type="checkbox"  th:field="*{enabled}" >
 				</div>
 			</div>
 			
@@ -168,9 +170,10 @@
 		
 		function checkEmailUnique(form)  {
 			url = "[[@{/users/check_email}]]";
+			userId = $("#id").val();
 			userEmail = $("#email").val();
 			csrfValue = $("input[name='_csrf']").val();
-			params = {email: userEmail, _csrf: csrfValue};
+			params = {id: userId, email: userEmail, _csrf: csrfValue};
 			
 			$.post(url, params, function(response) {
 				console.log(response);
