@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,">
+	<title>Websales Control Panel</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+	<div class="container-fluid">
+		<div>
+			<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+				<a class="navbar-brand" th:href="@{/}"> 
+					<img th:src="@{/images/ShopmeAdminSmall.png}"/>
+				</a>
+				
+				<button class="navbar-toggler" type="button" title="TogglerNavbar" data-bs-toggle="collapse" data-bs-target="#topNavbar">
+      				<span class="navbar-toggler-icon"></span>
+  			    </button>
+				<div class="collapse navbar-collapse" id="topNavbar">
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/users}">Users</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class= "nav-link" th:href="@{/categories}">Categories</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/brands}">Brands</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/products}">Products</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/customers}">Customers</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/shipping}">Shipping</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/orders}">Orders</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/report}">Sales Report</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/articles}">Articles</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/menus}">Menus</a>
+						</li>
+						
+						<li class="nav-item">
+							<a class="nav-link" th:href="@{/settings}">Settings</a>
+						</li>
+						
+					</ul>
+				</div>
+			</nav>
+		</div>
+		
+	</div>
+	
+	<div>
+		<h2>Manage Users | Create New User</h2>
+	</div>
+	
+	<div></div>
+	
+	<form th:action="@{/users/save}" method="post" style="max-width: 700x; margin: 0 auto"
+		 th:object="${user}" onsubmit="return checkEmailUnique(this)">
+		<div class="border border-primary rounded p-3">
+			<div class="form-group row">
+				<label class="col-sm-4 col-form-label">E-mail</label>
+				<div class="col-sm-8">
+					<input type="email" class="form-control" th:field="*{email}" id="email" required>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<label class="col-sm-4 col-form-label">First Name</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" th:field="*{firstName}" required>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<label class="col-sm-4 col-form-label">Last Name</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" th:field="*{lastName}" required>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<label class="col-sm-4 col-form-label">Password</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" th:field="*{password}" required>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<label class="col-sm-4 col-form-label">Roles</label>
+				<div class="col-sm-8">
+					<th:block th:each="role : ${listRoles}" >
+					<input type="checkbox" class="m-2"
+					 th:field="*{roles}" 
+					 th:text="${role.name}"
+					 th:value="${role.id}">
+					 - <small>[[${role.description}]]</small>
+					 <br/>
+					 </th:block>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<label class="col-sm-4 col-form-label">Enabled</label>
+				<div class="col-sm-8">
+					<input type="checkbox"  th:field="*{enabled}" required >
+				</div>
+			</div>
+			
+			<div class="text-center">
+				<input class="btn btn-primary" type="submit" value="Save"/>
+				<input class="btn btn-secondary" type="button" value="Cancel" id="buttonCancel"/>
+			</div>
+		</div>
+	
+	</form>
+	
+	<div class="modal fade text-center" id="modalDialog">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="modalTitle">Modal title</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        <h6 class="modal-title" id="modalBody">Modal Body</h6>
+	      </div>	
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div> 
+		<p>Websales Control Panel - Copyright</p>
+	</div>
+
+<script type="text/javascript">
+		$(document).ready(function() {
+			$("#buttonCancel").on("click", function() { 
+				window.location = "[[@{/users}]]";
+			});		
+		});
+		
+		function checkEmailUnique(form)  {
+			url = "[[@{/users/check_email}]]";
+			userEmail = $("#email").val();
+			csrfValue = $("input[name='_csrf']").val();
+			params = {email: userEmail, _csrf: csrfValue};
+			
+			$.post(url, params, function(response) {
+				console.log(response);
+				if(response == "OK") {
+					form.submit();
+				} else if(response == "DUPLICATED") {
+					 showModalDialog("WARNING","There is another user having this email " + userEmail); 
+				} else{
+					showModalDialog("Error", "Fail respone from server");
+				}
+			}).fail(function() {
+				showModalDialog("Error", "Could not connect the server ");
+			});
+			 
+			return false;
+		}
+		
+		function showModalDialog(title, message) {
+			$("#modalTitle").text(title);
+			$("#modalBody").text(message);
+			 var myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
+		     myModal.show();
+		}
+		
+</script>
+
+</body>
+</html>
