@@ -116,15 +116,50 @@
 					<td>
 						<a class="fa fa-2x fa-pen-to-square icon-green" th:href="@{'/users/edit/' + ${user.id}}"></a>
 						&nbsp;
-						<a class="fa fa-2x fa-trash icon-silver" href=""></a>
+						<a class="fa fa-2x fa-trash icon-silver delete-user"
+						 th:href="@{'/users/delete/' + ${user.id}}"
+						 th:userID="${user.id}"></a>
 					 </td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 	
+	<div class="modal fade text-center" id="modalDialog">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="modalTitle">Modal title</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        <h6 class="modal-title" id="modalBody">Modal Body</h6>
+	      </div>	
+	      <div class="modal-footer">
+	         <a class="btn btn-success" href="" id="yesButton">Yes</a>
+	         <button type="button" class="btn btn-warning" data-bs-dismiss="modal">No</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	
 	<div> 
 		<p>Websales Control Panel - Copyright</p>
 	</div>
+	
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".delete-user").on("click", function(e){
+			e.preventDefault();
+			link = $(this);
+			userId = link.attr("userId");
+			$("#yesButton").attr("href", link.attr("href"));
+			$("#modalBody").text("Are you sure you want to delete this user ID " + userId + " ?");
+			 var myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
+		     myModal.show();
+		});
+	});
+</script>
 </body>
 </html>

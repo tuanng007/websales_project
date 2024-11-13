@@ -46,6 +46,16 @@ public class UserService {
 		}
 	}
 	
+	public void delete(Integer id) throws UserNotFoundException {
+		Long countById = userRepo.countById(id);
+		if(countById == null || countById == 0) { 
+			throw new UserNotFoundException("Could not find any user with ID: " + id);
+		} else { 
+			userRepo.deleteById(id);
+		}
+		
+	}
+	
 	// Kiểm tra email có phải duy nhất ?
 	public boolean isEmailUnique(Integer id ,String email) { 
 		User userByEmail = userRepo.getUserByEmail(email); 
