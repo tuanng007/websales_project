@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import com.websales.common.entity.Role;
 import com.websales.common.entity.User;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class UserService {
 	
 	@Autowired
@@ -71,6 +74,11 @@ public class UserService {
 		}
 		
 		return true;
+	}
+	
+	
+	public void updateUserEnabledStatus(Integer id, boolean enabled) { 
+		userRepo.updateEnabledStatus(id, enabled);
 	}
 	
 	public void save(User user) { 

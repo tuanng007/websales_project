@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.service.annotation.PatchExchange;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.websales.common.entity.Role;
@@ -72,6 +73,17 @@ public class UserController {
 		return "redirect:/users";
 	}
 	
+	
+	@GetMapping("users/{id}/enabled/{status}")
+	public String changeUserEnabledStatus(@PathVariable(name="id") Integer id, @PathVariable(name="status") boolean enabled, 
+			RedirectAttributes redirectAttributes) {
+		
+		userService.updateUserEnabledStatus(id, enabled);
+		String status = enabled ? "enabled" : "disabled";
+		
+		redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been " + status);
+		return "redirect:/users";
+	} 
 	
 	@PostMapping("/users/save")
 	public String saveUser(User user, RedirectAttributes redirectAttributes) { 
