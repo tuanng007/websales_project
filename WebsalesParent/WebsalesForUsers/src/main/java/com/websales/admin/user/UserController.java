@@ -5,6 +5,7 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -27,12 +28,35 @@ public class UserController {
 	private UserService userService;
 	
 	@GetMapping("/users")
-	public String listAllUser(Model model) { 
-		List<User> listUsers = userService.listAll();
+	public String listFirstPage(Model model) { 
+		return listByPage(1, model);
+	}
+	
+	
+	@GetMapping("/users/page/{pageNum}")
+	public String listByPage(@PathVariable(name="pageNum") int pageNum, Model model) {
+		Page<User> page = userService.listByPage(pageNum);
+		List<User> listUsers = page.getContent();
+		
+//		System.out.println("Pagenum: " + pageNum);
+//		System.out.println("Total element: " + page.getTotalElements());
+//		System.out.println("Total page: " + page.getTotalPages());
+		
+		long startCount = (pageNum - 1) * UserService.USERS_PER_PAGE + 1;
+		long endCount = startCount + UserService.USERS_PER_PAGE - 1;
+		if(endCount > page.getTotalElements()) { 
+			endCount = page.getTotalElements();
+		}
+		
+		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("totalPages", page.getTotalPages());
+		model.addAttribute("startCount", startCount);
+		model.addAttribute("endCount", endCount);
+		model.addAttribute("totalItems", page.getTotalElements());
 		model.addAttribute("listUsers", listUsers);
 		
 		return "users";
-	}
+	} 
 	
 	@GetMapping("/users/new")
 	public String newUser(Model model) {
@@ -64,7 +88,7 @@ public class UserController {
 		}
 	}
 	
-	@GetMapping("users/delete/{id}")
+	@GetMapping("/users/delete/{id}")
 	public String deleteUser(@PathVariable(name="id") Integer id, Model model, RedirectAttributes redirectAttributes) { 
 		
 		try { 
@@ -79,7 +103,7 @@ public class UserController {
 	}
 	
 	
-	@GetMapping("users/{id}/enabled/{status}")
+	@GetMapping("/users/{id}/enabled/{status}")
 	public String changeUserEnabledStatus(@PathVariable(name="id") Integer id, @PathVariable(name="status") boolean enabled, 
 			RedirectAttributes redirectAttributes) {
 		
@@ -89,6 +113,8 @@ public class UserController {
 		redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been " + status);
 		return "redirect:/users";
 	} 
+	
+
 	
 	@PostMapping("/users/save")
 	public String saveUser(User user, RedirectAttributes redirectAttributes, @RequestParam("image") MultipartFile multipartFile) throws IOException { 
