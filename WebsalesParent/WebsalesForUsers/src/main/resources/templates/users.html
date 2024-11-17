@@ -83,6 +83,19 @@
 	</div>
 	
 	<div>
+		<form th:action="@{/users/page/1}" class="form-inline m-3">
+			<input type="hidden" name="sortField" th:value="${sortField}"/>
+			<input type="hidden" name="sortDir" th:value="${sortDir}"/>
+			Search: &nbsp;
+			<input type="search" name="keyword" th:value="${keyword}" class="form-control"required>
+			&nbsp;&nbsp;
+			<input type="submit" value="Search" class="btn btn-primary"/>
+			&nbsp;&nbsp;
+			<input type="button" value="Clear" class="btn btn-secondary" onclick="clearSearch()"/>
+		</form>
+	</div>
+	
+	<div>
 		<a th:href="@{users/new}">Create New User</a>
 	</div>
 	
@@ -92,11 +105,11 @@
 				<tr>
 					<th>
 						<a th:if="${sortField != 'id'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${sortDir}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							ID
 						</a>
 						<a th:if="${sortField == 'id'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reSort}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							ID
 						</a>
 						<span th:if="${sortField == 'id'}"
@@ -105,11 +118,11 @@
 					<th>Photos</th>
 					<th>
 						<a th:if="${sortField != 'email'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=email&sortDir=' + ${sortDir}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=email&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							Email
 						</a>
 						<a th:if="${sortField == 'email'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=email&sortDir=' + ${reSort}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=email&sortDir=' + ${reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							Email
 						</a>
 						<span th:if="${sortField == 'email'}"
@@ -117,11 +130,11 @@
 					</th>
 					<th>
 						<a th:if="${sortField != 'firstName'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=firstName&sortDir=' + ${sortDir}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=firstName&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							First Name
 						</a>
 						<a th:if="${sortField == 'firstName'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=firstName&sortDir=' + ${reSort}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=firstName&sortDir=' + ${reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							First Name
 						</a>
 						<span th:if="${sortField == 'firstName'}"
@@ -129,11 +142,11 @@
 					</th>
 					<th>
 						<a th:if="${sortField != 'lastName'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=lastName&sortDir=' + ${sortDir}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=lastName&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							Last Name
 						</a>
 						<a th:if="${sortField == 'lastName'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=lastName&sortDir=' + ${reSort}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=lastName&sortDir=' + ${reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							Last Name
 						</a>
 						<span th:if="${sortField == 'lastName'}"
@@ -142,11 +155,11 @@
 					<th>Roles</th>
 					<th>
 						<a th:if="${sortField != 'enabled'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=enabled&sortDir=' + ${sortDir}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=enabled&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							Enabled
 						</a>
 						<a th:if="${sortField == 'enabled'}" class="text-white"
-							th:href="@{'/users/page/' + ${currentPage} + '?sortField=enabled&sortDir=' + ${reSort}}">
+							th:href="@{'/users/page/' + ${currentPage} + '?sortField=enabled&sortDir=' + ${reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 							Enabled
 						</a>
 						<span th:if="${sortField == 'enabled'}"
@@ -192,7 +205,7 @@
 		<span>No users found</span>
 	</div>
 	
-	<div>
+	<div th:if="${totalPages > 1}">
 		<nav>
 		  <ul class="pagination justify-content-center">
 		    <li th:class="${currentPage > 1 ? 'page-item': 'page-item disabled'}">
@@ -250,6 +263,10 @@
 		     myModal.show();
 		});
 	});
+	
+	function clearSearch() { 
+		window.location = "[[@{/users}]]"
+	}
 </script>
 </body>
 </html>
