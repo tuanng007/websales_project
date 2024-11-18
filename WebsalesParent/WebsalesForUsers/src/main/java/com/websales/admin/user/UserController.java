@@ -22,6 +22,8 @@ import com.websales.admin.FileUploadUtil;
 import com.websales.common.entity.Role;
 import com.websales.common.entity.User;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Controller
 public class UserController {
 	
@@ -30,18 +32,16 @@ public class UserController {
 	
 	@GetMapping("/users")
 	public String listFirstPage(Model model) { 
-		return listByPage(1, model,"firstName", "asc");
+		return listByPage(1, model,"firstName", "asc", null);
 	}
 	
 	
 	@GetMapping("/users/page/{pageNum}")
 	public String listByPage(@PathVariable(name="pageNum") int pageNum, Model model
-			, @Param("sortField") String sortField, @Param("sortDir") String sortDir) {
-		Page<User> page = userService.listByPage(pageNum, sortField, sortDir);
+			, @Param("sortField") String sortField, @Param("sortDir") String sortDir, @Param("keyword") String keyword) {
+		Page<User> page = userService.listByPage(pageNum, sortField, sortDir, keyword);
 		List<User> listUsers = page.getContent();
-		
-		System.out.println("Sort field: " + sortField);
-		System.out.println("sort order: " + sortDir);
+	
 		long startCount = (pageNum - 1) * UserService.USERS_PER_PAGE + 1;
 		long endCount = startCount + UserService.USERS_PER_PAGE - 1;
 		if(endCount > page.getTotalElements()) { 
@@ -58,6 +58,7 @@ public class UserController {
 		model.addAttribute("sortField", sortField);
 		model.addAttribute("sortDir", sortDir);
 		model.addAttribute("reSort", reSort);
+		model.addAttribute("keyword", keyword);
 		model.addAttribute("listUsers", listUsers);
 		
 		return "users";
@@ -141,6 +142,25 @@ public class UserController {
 						
 		redirectAttributes.addFlashAttribute("message", "The user has been saved successfully!");
 		
-		return "redirect:/users";
+		String firstPartEmail = user.getEmail().split("@")[0];
+		
+		return "redirect:/users/page/1?sortField=id&sortDir=asc&keyword=" + firstPartEmail ;
+	}
+	
+	
+	@GetMapping("/users/export/csv")
+	public void exportToCSV(HttpServletResponse re) throws IOException { 
+		List<User> listUsers = userService.listAll();
+		UserCsvExporter exporter = new UserCsvExporter();
+		exporter.export(listUsers, re);
+	} 
+	
+	
+	@GetMapping("/users/export/excel")
+	public void exportToExcel(HttpServletResponse re) throws IOException { 
+		List<User> listUsers = userService.listAll();
+		UserExcelExporter exporter = new UserExcelExporter();
+		exporter.export(listUsers, re);
+		
 	}
  }
