@@ -1,4 +1,4 @@
-package com.websales.admin.user;
+package com.websales.admin.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

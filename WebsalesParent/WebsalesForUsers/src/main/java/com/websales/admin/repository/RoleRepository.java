@@ -1,4 +1,4 @@
-package com.websales.admin.user;
+package com.websales.admin.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
