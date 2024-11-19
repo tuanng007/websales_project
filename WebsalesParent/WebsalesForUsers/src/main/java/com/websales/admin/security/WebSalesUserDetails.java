@@ -72,7 +72,13 @@ public class WebSalesUserDetails implements UserDetails {
 	}
 	
 	
+	public void setFirstName(String firstName) {
+		this.user.setFirstName(firstName);
+	}
 	
+	public void setLastName(String lastName) {
+		this.user.setLastName(lastName);
+	}
 	
 	
 }
