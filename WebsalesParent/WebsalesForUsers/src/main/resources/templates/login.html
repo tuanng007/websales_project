@@ -10,7 +10,11 @@
 <div class="container-fluid text-center ">
 	<form th:action="@{/login}" method="post" style="max-width: 350px; margin: 0 auto">
 		<div th:if="${param.error}">
-			<p class="text-dange">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+			<p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+		</div>
+		
+			<div th:if="${param.logout}">
+			<p class="text-warning">You have been logged out</p>
 		</div>
 		
 		<div class = "border border-secondary rounded p-3">
