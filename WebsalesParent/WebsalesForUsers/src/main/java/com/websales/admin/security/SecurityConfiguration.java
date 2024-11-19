@@ -49,7 +49,10 @@ public class SecurityConfiguration {
             )
             .formLogin(form -> form
                 .loginPage("/login").usernameParameter("email").permitAll()
-            ).logout(logout -> logout.permitAll())
+            ).logout(logout ->
+            	logout.permitAll()
+            ).rememberMe(rememberMe -> 
+            	rememberMe.key("uniqueSecret").tokenValiditySeconds(604800))
             .httpBasic(withDefaults());
         return http.build();
     }
