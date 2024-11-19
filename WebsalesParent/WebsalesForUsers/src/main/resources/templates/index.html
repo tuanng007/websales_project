@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" 
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Websales Control Panel</title>
 	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/icon/all.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/style.css}"/>
 	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </head>
 <body>
@@ -64,7 +68,19 @@
 						<li class="nav-item">
 							<a class="nav-link" th:href="@{/settings}">Settings</a>
 						</li>
-						
+						<li>
+							<span class="fas fa-user fa-2x icon-silver"></span>
+						</li>
+						<li class="nav-item dropdown">
+						    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						        <!-- Hiển thị tên người dùng -->
+						        <span sec:authentication="principal.fullname"></span>
+						    </a>
+							    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+							        <li><a class="dropdown-item" href="#">Logout</a></li>
+							    </ul>
+						</li>
+
 					</ul>
 				</div>
 			</nav>

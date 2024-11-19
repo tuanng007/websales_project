@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Websales Control Panel</title>
 	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
 	<link rel="stylesheet" type="text/css" th:href="@{/icon/all.css}"/>
-		<link rel="stylesheet" type="text/css" th:href="@{/style.css}"/>
+	<link rel="stylesheet" type="text/css" th:href="@{/style.css}"/>
 	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
 	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 </head>
@@ -86,7 +87,7 @@
 		<form th:action="@{/users/page/1}" class="form-inline m-3">
 			<input type="hidden" name="sortField" th:value="${sortField}"/>
 			<input type="hidden" name="sortDir" th:value="${sortDir}"/>
-			Search: &nbsp;
+			Search:&nbsp;
 			<input type="search" name="keyword" th:value="${keyword}" class="form-control"required>
 			&nbsp;&nbsp;
 			<input type="submit" value="Search" class="btn btn-primary"/>
@@ -96,13 +97,13 @@
 	</div>
 	
 	<div>
-		<a th:href="@{/users/new}">Create New User</a>
+		<a th:href="@{/users/new}"><i class="fa fa-plus fa-2x icon-silver"></i></a>
 		&nbsp;|&nbsp;
-		<a th:href="@{/users/export/csv}">Export to CSV</a>
+		<a th:href="@{/users/export/csv}"><i class="fa fa-file-csv fa-2x icon-silver"></i></a>
 		&nbsp;|&nbsp;
-		<a th:href="@{/users/export/excel}">Export to Excel</a>
+		<a th:href="@{/users/export/excel}"><i class="fa fa-file-excel fa-2x icon-silver"></i></a>
 		&nbsp;|&nbsp;
-		<a th:href="@{/users/export/pdf}">Export to PDF</a>
+		<a th:href="@{/users/export/pdf}"><i class="fa fa-file-pdf fa-2x icon-silver"></i></a>
 	</div>
 	
 	<div>
@@ -133,17 +134,24 @@
 					<td>[[${user.lastName}]]</td>
 					<td>[[${user.roles}]]</td>
 					<td>
-						<a th:if="${user.enabled == true}" class="fas fa-circle-check fa-2x icon-green"
-							th:href="@{'/users/' + ${user.id} + '/enabled/false'}"></a>
-						<a th:if="${user.enabled == false}" class="fas fa-circle-check fa-2x icon-silver"
-							th:href="@{'/users/' + ${user.id} + '/enabled/true'}"></a>
+						<a th:if="${user.enabled == true}" 
+							th:href="@{'/users/' + ${user.id} + '/enabled/false'}">
+							<i class="fas fa-circle-check fa-2x icon-green"></i>
+						</a>
+						<a th:if="${user.enabled == false}" 
+							th:href="@{'/users/' + ${user.id} + '/enabled/true'}">
+							<i class="fas fa-circle-check fa-2x icon-silver"></i>
+						</a>
 					</td>
 					<td>
-						<a class="fa fa-2x fa-pen-to-square icon-green" th:href="@{'/users/edit/' + ${user.id}}"></a>
+						<a th:href="@{'/users/edit/' + ${user.id}}">
+							<i class="fa fa-2x fa-pen-to-square icon-green"></i>
+						</a>
 						&nbsp;
-						<a class="fa fa-2x fa-trash icon-silver delete-user"
-						 th:href="@{'/users/delete/' + ${user.id}}"
-						 th:userID="${user.id}"></a>
+						<a th:href="@{'/users/delete/' + ${user.id}}"
+						 th:userID="${user.id}">
+						 	<i class="fa fa-2x fa-trash icon-silver delete-user"></i>
+						 </a>
 					 </td>
 				</tr>
 			</tbody>
