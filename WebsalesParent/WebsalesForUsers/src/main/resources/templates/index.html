@@ -1,108 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Websales Control Panel</title>
-	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-	<link rel="stylesheet" type="text/css" th:href="@{/icon/all.css}"/>
-	<link rel="stylesheet" type="text/css" th:href="@{/style.css}"/>
-	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+<head th:replace="fragments :: page_head('Home - Websales')">
+	
 </head>
 <body>
-	<div class="container-fluid">
-		<div>
-			<form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
-				<input type="submit"/>
-			</form>
-		
-			<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
-				<a class="navbar-brand" th:href="@{/}"> 
-					<img th:src="@{/images/ShopmeAdminSmall.png}"/>
-				</a>
-				
-				<button class="navbar-toggler" type="button" title="TogglerNavbar" data-bs-toggle="collapse" data-bs-target="#topNavbar">
-      				<span class="navbar-toggler-icon"></span>
-  			    </button>
-				<div class="collapse navbar-collapse" id="topNavbar">
-					<ul class="navbar-nav">
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/users}">Users</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class= "nav-link" th:href="@{/categories}">Categories</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/brands}">Brands</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/products}">Products</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/customers}">Customers</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/shipping}">Shipping</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/orders}">Orders</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/report}">Sales Report</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/articles}">Articles</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/menus}">Menus</a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" th:href="@{/settings}">Settings</a>
-						</li>
-						<li>
-							<span class="fas fa-user fa-2x icon-silver"></span>
-						</li>
-						<li class="nav-item dropdown">
-						    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-						        <!-- Hiển thị tên người dùng -->
-						        <span sec:authentication="principal.fullname"></span>
-						    </a>
-							    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-							        <li><a class="dropdown-item" id="logoutLink" href="">Logout</a></li>
-							    </ul>
-						</li>
+	<div th:replace="navigation :: menu"></div>
 
-					</ul>
-				</div>
-			</nav>
-		</div>
-		
-	</div>
-	
 	<div>
 		<h1>Websales Control Panel</h1>
 	</div>
 	
-	<script type="text/javascript">
-		$(document).ready(function() { 
-			$("#logoutLink").on("click", function(e) { 
-				e.preventDefault();
-				document.logoutForm.submit();
-			});
-		});
-	</script>
+	<div th:replace="fragments :: footer"></div>
+	
+
 </body>
 </html>
