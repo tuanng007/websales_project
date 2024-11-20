@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="fragments :: page_head('Home - Websales')">
+<head th:replace="~{fragments :: page_head('Home - Websales')}">
 	
 </head>
 <body>
-	<div th:replace="navigation :: menu"></div>
+	<div th:replace="~{navigation :: menu}"></div>
 
 	<div>
 		<h1>Websales Control Panel</h1>
@@ -17,7 +17,7 @@
 	<span sec:authentication="principal.authorities"></span>	
 	
 	
-	<div th:replace="fragments :: footer"></div>
+	<div th:replace="~{fragments :: footer}"></div>
 	
 
 </body>

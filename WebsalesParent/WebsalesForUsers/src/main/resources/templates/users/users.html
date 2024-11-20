@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="fragments :: page_head('Manage User')">
+<head th:replace="~{fragments :: page_head('Manage User')}">
 	
 </head>
 <body>
-	<div th:replace="navigation :: menu"></div>
+	<div th:replace="~{navigation :: menu}"></div>
 	<div>
 		<h2>Manage Users</h2>
 	</div>
@@ -137,7 +137,7 @@
 	  </div>
 	</div>
 	
-	<div th:replace="fragments :: footer"></div>
+	<div th:replace="~{fragments :: footer}"></div>
 	
 <script type="text/javascript">
 $(document).ready(function(){

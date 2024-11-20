@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments :: page_head('Account Details')">
+<head th:replace="~{fragments :: page_head('Account Details')}">
 </head>
 <body>
 	<div class="container-fluid">
@@ -98,12 +98,9 @@
 	  </div>
 	</div>
 
-	<div> 
-		<p>Websales Control Panel - Copyright</p>
-	</div>
-
+	<div th:replace="~{fragments :: footer}"></div>
 <script type="text/javascript">
-		modelURL = "[[@{/}]]"
+		moduleURL = "[[@{/}]]"
 		function checkPasswordMatch(confirmPassword) { 
 			if(confirmPassword.value != $("#password").val()) { 
 				confirmPassword.setCustomValidity("Passwords do not match!!!");
@@ -131,10 +128,11 @@
 			}).fail(function() {
 				showModalDialog("Error", "Could not connect the server ");
 			});
+		}
 			 
 </script>
 
-<script th:src="@{/js/common_form .js}"></script>
+<script th:src="@{/js/common_form.js}"></script>
 
 </body>
 </html>
