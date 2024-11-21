@@ -41,13 +41,13 @@
 		<table class="table table-responsive-xl table-bordered table-striped">
 			<thead class="table-dark"> 
 				<tr>
-					<th th:replace="fragments :: column_link('id','User ID')" />
+					<th th:replace="~{fragments :: column_link('id','User ID')}" />
 					<th>Photos</th>
-					<th th:replace="fragments :: column_link('email','Email')" />
-					<th th:replace="fragments :: column_link('firstName','First name')" />
-					<th th:replace="fragments :: column_link('lastName','Last name')" />
+					<th th:replace="~{fragments :: column_link('email','Email')}" />
+					<th th:replace="~{fragments :: column_link('firstName','First name')}" />
+					<th th:replace="~{fragments :: column_link('lastName','Last name')}" />
 					<th>Roles</th>
-					<th th:replace="fragments :: column_link('enabled','Enabled')" />
+					<th th:replace="~{fragments :: column_link('enabled','Enabled')}" />
 						
 					<th> </th>
 				</tr>

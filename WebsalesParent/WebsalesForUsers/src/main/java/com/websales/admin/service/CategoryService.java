@@ -2,12 +2,14 @@ package com.websales.admin.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.poi.poifs.property.Parent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.websales.admin.exception.CategoryNotFoundException;
 import com.websales.admin.repository.CategoryRepository;
 import com.websales.common.entity.Category;
 
@@ -102,6 +104,14 @@ public class CategoryService {
 			
 			listSubCategoriesUsedInForm(categoriesInForm, subCategory, newSubLevel);
 		} 
+	}
+	
+	public Category get(Integer id) throws CategoryNotFoundException { 
+		try { 
+			return categoryRepo.findById(id).get();
+		}catch (NoSuchElementException e) {
+			throw new CategoryNotFoundException("Could not find any categories id: " + id);
+		}
 	}
 	
 	public Category save(Category category) {
