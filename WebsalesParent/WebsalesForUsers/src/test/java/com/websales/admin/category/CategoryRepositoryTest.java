@@ -100,4 +100,12 @@ public class CategoryRepositoryTest {
 	}
 	
 	
+	@Test
+	public void testListRootCategories() { 
+		List<Category> cateList = categoryRepo.findRootCategories();
+		cateList.forEach(cate -> System.out.println(cate.getName()));
+	}
+ 	
+	
+	
 }

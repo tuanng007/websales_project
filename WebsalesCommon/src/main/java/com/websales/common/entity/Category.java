@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name="categories")
@@ -62,6 +63,23 @@ public class Category {
 		
 		return copyCategory;
 	}
+	
+	public static Category copyAll(Category category) { 
+		Category copyCategory = new Category();
+		copyCategory.setId(category.getId());
+		copyCategory.setName(category.getName());
+		copyCategory.setImages(category.getImages());
+		copyCategory.setAlias(category.getAlias());	
+		copyCategory.setEnabled(category.isEnabled());
+		
+		return copyCategory;
+	}
+	
+	public static Category copyAll(Category category, String name) { 
+		Category copyCategory = Category.copyAll(category);
+		copyCategory.setName(name);
+		return copyCategory;
+	} 
 	
 	public Category(String name) { 
 		this.name = name;
@@ -130,7 +148,10 @@ public class Category {
 		this.children = children;
 	}
 	
-	
+	@Transient
+	public String getImagePath() { 
+		return "/category-images/" + this.id + "/" + this.images;
+	}
 	
 	
 }
