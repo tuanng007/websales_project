@@ -3,15 +3,13 @@
 <head th:replace="~{fragments :: page_head('Account Details')}">
 </head>
 <body>
-	<div class="container-fluid">
 		<div th:replace="navigation :: menu"></div>	
-	</div>
 	
 	<div th:if="${message != null}" class="alert alert-success text-center">
 		[[${message}]]
 	</div>
 	
-	<form th:action="@{/account/update}" method="post" style="max-width: 700x; margin: 0 auto"
+	<form th:action="@{/account/update}" method="post" style="max-width: 700px; margin: 0 auto"
 		 th:object="${user}" onsubmit="return checkEmailUnique(this)"
 		 enctype="multipart/form-data">
 		 <input type="hidden" th:field="*{id}" id="id">
@@ -20,28 +18,28 @@
 				<h2>Account Details</h2>
 		</div>
 		<div class="border border-primary rounded p-3">
-			<div class="form-group row">
+			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label">E-mail</label>
 				<div class="col-sm-8">
 					<input type="email" class="form-control" th:field="*{email}" id="email" readonly="readonly">
 				</div>
 			</div>
 			
-			<div class="form-group row">
+			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label">First Name</label>
 				<div class="col-sm-8">
 					<input type="text" class="form-control" th:field="*{firstName}" required>
 				</div>
 			</div>
 			
-			<div class="form-group row">
+			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label">Last Name</label>
 				<div class="col-sm-8">
 					<input type="text" class="form-control" th:field="*{lastName}" required>
 				</div>
 			</div>
 			
-			<div class="form-group row">
+			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label">Password</label>
 				<div class="col-sm-8">
 					<input type="password" th:field="*{password}" class="form-control" placeholder="Leave blank if you don't want to change it"
@@ -49,21 +47,21 @@
 				</div>
 			</div>
 			
-			<div class="form-group row">
+			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label"> Confirm Password</label>
 				<div class="col-sm-8">
 					<input type="password" id="confirmPassword" class="form-control" oninput="checkPasswordMatch(this)">
 				</div>
 			</div>
 			
-			<div class="form-group row">
+			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label">Assigned Roles:</label>
 				<div class="col-sm-8">
 					<span><b>[[${user.roles}]]</b></span>
 				</div>
 			</div>
 			
-			<div class="form-group row">
+			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label">Photos</label>
 				<div class="col-sm-8">
 					<input type="hidden" th:field="*{photos}" />
@@ -73,7 +71,7 @@
 			</div>
 			
 			
-			<div class="text-center">
+			<div class="text-center p-2">
 				<input class="btn btn-primary" type="submit" value="Update"/>
 				<input class="btn btn-secondary" type="button" value="Cancel" id="buttonCancel"/>
 			</div>
