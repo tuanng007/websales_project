@@ -107,5 +107,22 @@ public class CategoryRepositoryTest {
 	}
  	
 	
+	@Test 
+	public void testFindByName() { 
+		String name = "Electronics";
+		Category category = categoryRepo.findByName(name);
+		assertThat(category).isNotNull();
+		assertThat(category.getName()).isEqualTo(name);
+	}
+	
+	@Test
+	public void testFindByAlias() { 
+		String alias = "Camera";
+		Category category = categoryRepo.findByAlias(alias);
+		
+		assertThat(category).isNotNull();
+		assertThat(category.getAlias()).isEqualTo(alias);
+	}
+	
 	
 }

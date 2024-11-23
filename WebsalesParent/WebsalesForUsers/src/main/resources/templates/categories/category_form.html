@@ -9,20 +9,21 @@
 	</div>
 	
 	<form th:action="@{/categories/save}" method="post" style="max-width: 700px; margin: 0 auto"
-		th:object="${category}" enctype="multipart/form-data">
+		th:object="${category}" enctype="multipart/form-data"
+		onsubmit="return checkUniqueCate(this)">
 		<input type="hidden" th:field="*{id}" id="id">
 		<div class="border border-primary rounded p-3">
 			<div class="form-group row p-2">
 				<label class="col-sm-4 col-form-label">Category Name:</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" th:field="*{name}">
+					<input type="text" class="form-control" th:field="*{name}" id="name">
 				</div>
 			</div>
 			
 			<div class="form-group row p-2" >
 				<label class="col-sm-4 col-form-label">Alias:</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" th:field="*{alias}">
+					<input type="text" class="form-control" th:field="*{alias}" id="alias">
 				</div>
 			</div>
 			
@@ -70,11 +71,47 @@
 	
 	</form>	
 	
+	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
 	
 	<div th:replace="~{fragments :: footer}"></div>
 	
 <script type="text/javascript">
-moduleURL = "[[@{/categories}]]"
+	moduleURL = "[[@{/categories}]]"
+	
+	function checkUniqueCate(form)  {
+		url = "[[@{/categories/check_unique}]]";
+		
+		cateID = $("#id").val();
+		cateName = $("#name").val();
+		cateAlias = $("#alias").val();
+		csrfValue = $("input[name='_csrf']").val();
+		
+		params = {id: cateID, name: cateName, alias: cateAlias, _csrf: csrfValue};
+		
+		$.post(url, params, function(response) {
+			if(response == "OK") { 
+				form.submit();
+			} else if(response == "DuplicateName") {
+				showWarningModal("There is already category name :" + cateName);
+			} else if(response == "DuplicateAlias") {
+				showWarningModal("There is already category alias: " + cateAlias);
+			} else {
+				showErrorModal("Fail response from the server");
+			}
+			
+		}).fail(function(){
+			showErrorModal("Could not connect to the server");
+		});
+		return false;
+	}
+	
+	function showErrorModal(message) { 
+		showModalDialog("Error", message);
+	}
+	
+	function showWarningModal(message)  {
+		showModalDialog("Warning", message);
+	}
 </script>
 <script th:src="@{/js/common_form.js}"></script>
 

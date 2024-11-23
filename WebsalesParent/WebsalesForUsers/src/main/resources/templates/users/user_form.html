@@ -82,22 +82,7 @@
 	
 	</form>
 	
-	<div class="modal fade text-center" id="modalDialog">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h5 class="modal-title" id="modalTitle">Modal title</h5>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	      <div class="modal-body">
-	        <h6 class="modal-title" id="modalBody">Modal Body</h6>
-	      </div>	
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
+	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
 
 	<div th:replace="~{fragments :: footer}"> </div>
 
@@ -115,15 +100,23 @@
 				if(response == "OK") {
 					form.submit();
 				} else if(response == "DUPLICATED") {
-					 showModalDialog("WARNING","There is another user having this email " + userEmail); 
+					showWarningModal("There is another user having this email " + userEmail); 
 				} else{
-					showModalDialog("Error", "Fail respone from server");
+					showErrorModal( "Fail response from the server");
 				}
 			}).fail(function() {
-				showModalDialog("Error", "Could not connect the server ");
+				showErrorModal("Could not connect the server ");
 			});
 			 
 			return false;
+		}
+		
+		function showErrorModal(message) { 
+			showModalDialog("Error", message);
+		}
+		
+		function showWarningModal(message)  {
+			showModalDialog("Warning", message);
 		}
 
 </script>
