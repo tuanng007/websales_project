@@ -3,14 +3,18 @@ package com.websales.admin.category;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 
 import com.websales.admin.repository.CategoryRepository;
@@ -68,7 +72,7 @@ public class CategoryRepositoryTest {
 	
 	@Test
 	public void testPrintHierachicalCategories() { 
-		Iterable<Category> categories = categoryRepo.findAll();
+		Iterable<Category> categories = categoryRepo.findRootCategories(Sort.by("name").ascending());
 		
 		for(Category category : categories) { 
 			if(category.getParent() == null) { 
@@ -102,7 +106,7 @@ public class CategoryRepositoryTest {
 	
 	@Test
 	public void testListRootCategories() { 
-		List<Category> cateList = categoryRepo.findRootCategories();
+		List<Category> cateList = categoryRepo.findRootCategories(Sort.by("name").ascending());
 		cateList.forEach(cate -> System.out.println(cate.getName()));
 	}
  	
@@ -123,6 +127,8 @@ public class CategoryRepositoryTest {
 		assertThat(category).isNotNull();
 		assertThat(category.getAlias()).isEqualTo(alias);
 	}
+	
+	
 	
 	
 }

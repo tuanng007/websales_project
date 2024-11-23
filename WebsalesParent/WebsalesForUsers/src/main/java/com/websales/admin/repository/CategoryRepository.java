@@ -2,6 +2,7 @@ package com.websales.admin.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -13,7 +14,7 @@ import com.websales.common.entity.Category;
 public interface CategoryRepository extends PagingAndSortingRepository<Category, Integer>, CrudRepository<Category, Integer> {
 	
 	@Query("SELECT cat FROM Category cat WHERE cat.parent.id is NULL")
-	public List<Category> findRootCategories();
+	public List<Category> findRootCategories(Sort sort);
 	
 	public Category findByName(String name);
 	
