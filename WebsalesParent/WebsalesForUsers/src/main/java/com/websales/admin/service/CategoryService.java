@@ -9,6 +9,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +19,36 @@ import com.websales.admin.exception.CategoryNotFoundException;
 import com.websales.admin.repository.CategoryRepository;
 import com.websales.common.entity.Category;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class CategoryService {
+	
+	public static final int CATEGORIES_PER_PAGE = 4;
 	
 	@Autowired
 	private CategoryRepository categoryRepo;
+	
+	public List<Category> listByPage(CategoryPageInfo pageInfo,int pageNum, String sortDir) {
+		Sort sort = Sort.by("name");
+		
+		if(sortDir.equals("asc")) { 
+			sort = sort.ascending();
+		} else if(sortDir.equals("desc")) {
+			sort = sort.descending();
+		}
+		
+		Pageable pageable = PageRequest.of(pageNum - 1, CATEGORIES_PER_PAGE, sort);
+		
+		Page<Category> pageCategory = categoryRepo.findRootCategories(pageable);
+		List<Category> listRootCategories = pageCategory.getContent();
+		
+		pageInfo.setTotalPages(pageCategory.getTotalPages());
+		pageInfo.setTotalElements(pageCategory.getTotalElements());
+		
+		return listHierarchicalCategories(listRootCategories, sortDir);
+	}
 	
 	public List<Category> listAll(String sortDir){
 		Sort sort = Sort.by("name");
@@ -178,10 +206,24 @@ public class CategoryService {
 		
 	}
 	
+	public void updateCategoryEnabledStatus(Integer id, boolean status) { 
+		categoryRepo.updateEnabledStatus(id, status);
+	}
+	
+	public void delete(Integer id) throws CategoryNotFoundException { 
+		Long categoryById = categoryRepo.countById(id);
+		if(categoryById == null || categoryById == 0) { 
+			throw new CategoryNotFoundException("Could not find any category ID: " + categoryById);
+		}
+		else  {
+		categoryRepo.deleteById(id);
+		}
+	}
+	
+	
 	public Category save(Category category) {
 		return categoryRepo.save(category);
 	}
-	
 	
 	
 }

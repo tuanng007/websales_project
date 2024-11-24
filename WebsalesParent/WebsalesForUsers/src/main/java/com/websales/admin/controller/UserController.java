@@ -41,7 +41,7 @@ public class UserController {
 	}
 	
 	
-	@GetMapping("/users/page/{pageNum}")
+	@GetMapping("/users/page/{pageNum}"	)
 	public String listByPage(@PathVariable(name="pageNum") int pageNum, Model model
 			, @Param("sortField") String sortField, @Param("sortDir") String sortDir, @Param("keyword") String keyword) {
 		Page<User> page = userService.listByPage(pageNum, sortField, sortDir, keyword);
@@ -142,7 +142,9 @@ public class UserController {
 			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
 
 		} else { 
-			if(user.getPhotos().isEmpty()) user.setPhotos(null);
+			if(user.getPhotos().isEmpty()) {
+				user.setPhotos(null);
+			}
 			userService.save(user);
 		}
 						

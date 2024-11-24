@@ -103,6 +103,16 @@ public class CategoryRepositoryTest {
 				
 	}
 	
+	@Test
+	public void testCountById() { 
+		Integer id = 1;
+		
+		Long cateById = categoryRepo.countById(id);
+		
+		assertThat(cateById).isNotNull().isGreaterThan(0);
+		
+	}
+	
 	
 	@Test
 	public void testListRootCategories() { 

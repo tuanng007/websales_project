@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.websales.admin.FileUploadUtil;
 import com.websales.admin.exception.CategoryNotFoundException;
+import com.websales.admin.service.CategoryPageInfo;
 import com.websales.admin.service.CategoryService;
 import com.websales.common.entity.Category;
 
@@ -31,17 +32,29 @@ public class CategoryController {
 	private CategoryService categoryService;
 	
 	@GetMapping("/categories")
-	public String listAllCategories(@Param("sortDir") String sortDir, Model model) {
+	public String listFirstPage(@Param("sortDir") String sortDir, Model model) {
+		return  listCategoryByPage(1, sortDir, model);
+	}
+	
+	@GetMapping("/categories/page/{pageNum}")
+	public String listCategoryByPage(@PathVariable("pageNum") int pageNum, @Param("sortDir") String sortDir, Model model) { 
 		if(sortDir == null || sortDir.isEmpty()) { 
 			sortDir = "asc";
 		}
+		CategoryPageInfo pageInfo = new CategoryPageInfo();
 		
-		List<Category> listCategories = categoryService.listAll(sortDir);
+		List<Category> listCategories = categoryService.listByPage(pageInfo, pageNum, sortDir);
+		
 		String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
-		 
-		model.addAttribute("listCategories", listCategories);
-		model.addAttribute("reverseSortDir", reverseSortDir);
 		
+		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("totalPages", pageInfo.getTotalPages());
+		model.addAttribute("totalItems", pageInfo.getTotalElements());
+		model.addAttribute("sortDir", sortDir);
+		model.addAttribute("sortField", "name");
+		model.addAttribute("reverseSortDir", reverseSortDir);
+		model.addAttribute("listCategories", listCategories);
+ 		
 		return "/categories/categories";
 	}
 	
@@ -74,6 +87,36 @@ public class CategoryController {
 			return "redirect:/categories";
 		} 
 	}
+	
+	@GetMapping("/categories/{id}/enabled/{status}")
+	public String changeEnabledStatus(@PathVariable("id") Integer id, @PathVariable("status") boolean enabled, RedirectAttributes redirectAttributes) { 
+		
+		categoryService.updateCategoryEnabledStatus(id, enabled);
+		
+		String status = enabled ? "enabled" : "disabled";
+		
+		redirectAttributes.addFlashAttribute("message", "The category ID: " + id + " has been " + status);
+		
+		return "redirect:/categories";
+		
+		
+	}
+	
+	@GetMapping("/categories/delete/{id}")
+	public String deleteCategory(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) throws CategoryNotFoundException { 
+		try {
+			categoryService.delete(id);
+			String categoryDir = "../category-images/";
+			FileUploadUtil.removeDir(categoryDir);
+			
+			redirectAttributes.addFlashAttribute("message", "The category ID: " + id + " has been deleted successfully");
+			
+		} catch (CategoryNotFoundException e) {
+			redirectAttributes.addFlashAttribute("message", e);
+		}
+		return "redirect:/categories";
+	}
+	
 	
 	@PostMapping("/categories/save")
 	public String saveCategory(Category category, RedirectAttributes redirectAttributes,

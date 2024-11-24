@@ -106,23 +106,28 @@ public class UserService {
 		userRepo.updateEnabledStatus(id, enabled);
 	}
 	
-	public User save(User user) { 
-		boolean isUpdatingUser = (user.getId() != null);
-		
-		User existingUser = userRepo.findById(user.getId()).get();
+	public User save(User user) {
+	    boolean isUpdatingUser = (user.getId() != null);
 
-		
-		if(isUpdatingUser) { 			
-			if(user.getPassword().isEmpty()) { 
-				user.setPassword(existingUser.getPassword());
-			} else {
-				encodePassword(user);
-			}
-		}else { 
-			encodePassword(user);
-		}
-		 	return userRepo.save(user);
+	    if (isUpdatingUser) {
+	        // Chỉ tìm kiếm User hiện tại nếu đang cập nhật
+	        User existingUser = userRepo.findById(user.getId())
+	                                    .orElseThrow(() -> new IllegalArgumentException("Could not found User with ID: " + user.getId()));
+
+	        // Nếu password mới trống, giữ nguyên password cũ
+	        if (user.getPassword().isEmpty()) {
+	            user.setPassword(existingUser.getPassword());
+	        } else {
+	            encodePassword(user); // Encode lại password mới
+	        }
+	    } else {
+	        // Encode password cho User mới
+	        encodePassword(user);
+	    }
+
+	    return userRepo.save(user);
 	}
+
 
 	
 	public User updateAccount(User userInForm) { 

@@ -42,7 +42,7 @@ public class UserRepositoryTest {
 	
 	@Test
 	public void testCreateUserWithMoreRoles() { 
-		User userDavid = new User("david585@gmail.com","1234", "David", "Goggin");
+		User userDavid = new User("davi321d584325@gmail.com","1234", "David", "Goggin");
 		Role roleStorekeeper = new Role(3);
 		Role roleShipper = new Role(4);
 		

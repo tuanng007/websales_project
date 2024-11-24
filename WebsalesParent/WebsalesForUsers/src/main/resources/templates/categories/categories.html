@@ -43,7 +43,7 @@
 					<th>ID</th>
 					<th>Category Image</th>
 					<th>
-						<a class="text-white" th:href="@{'/categories?sortDir=' + ${reverseSortDir}}">Category Name</a>
+						<a class="text-white" th:href="@{'/categories/page/' + ${pageNum} + '?sortDir=' + ${reverseSortDir}}">Category Name</a>
 						<span th:class="${reverseSortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></span>
 					</th>
 					<th>Alias</th>
@@ -61,50 +61,19 @@
 					<td>[[${category.name}]]</td>
 					<td>[[${category.alias}]]</td>
 					<td>
-						<a th:if="${category.enabled == true}"
-							th:href="@{'/categories/' + ${category.id} + '/enabled/false'}">
-							<i class="fas fa-circle-check fa-2x icon green"></i>
-						</a>
-						
-						<a th:if="${category.enabled != true}"
-							th:href="@{'/categories/' + ${category.id} + '/enabled/true'}">
-							<i class="fas fa-circle-check fa-2x icon-silver"></i>
-							</a>
-							
+						<div th:replace="fragments :: category_status"></div>
 					</td>
 					<td>
-						<a th:href="@{'/categories/edit/' + ${category.id}}">
-							<i class="fa fa-2x fa-pen-to-square icon-green"></i>
-						</a>
-						&nbsp;
-						<a th:href="@{'/categories/delete/' + ${category.id}}" class="delete-category"  th:categoryId="${category.id}">
-							<i class="fa fa-2x fa-trash icon-silver"></i>
-						</a>
+						<div th:replace="fragments :: category_actions"></div>
 					 </td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 	
+	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
 	
-	<div class="modal fade text-center" id="modalDialog">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <h5 class="modal-title" id="modalTitle">Modal title</h5>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	      <div class="modal-body">
-	        <h6 class="modal-title" id="modalBody">Modal Body</h6>
-	      </div>	
-	      <div class="modal-footer">
-	         <a class="btn btn-success" href="" id="yesButton">Yes</a>
-	         <button type="button" class="btn btn-warning" data-bs-dismiss="modal">No</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	
+	<div th:replace="~{fragments :: pagination('/categories', 'category')}"></div>
 	
 	<div th:replace="~{fragments :: footer}"></div>
 </body>

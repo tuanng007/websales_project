@@ -14,9 +14,9 @@
 	
 </head>
 <body>
-	<th th:fragment="column_link(fieldName, columnLabel)">
+	<th th:fragment="column_link(moduleURL,fieldName, columnLabel)">
 		<a class="text-white" 
-			th:href="@{'/users/page/' + ${currentPage} + '?sortField=' + ${fieldName} + '&sortDir=' + ${sortField != fieldName ? sortDir : reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+			th:href="@{${moduleURL} + '/page/' + ${currentPage} + '?sortField=' + ${fieldName} + '&sortDir=' + ${sortField != fieldName ? sortDir : reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 			[[${columnLabel}]]
 		</a>
 		<span th:if="${sortField == fieldName}"
@@ -24,12 +24,71 @@
 	</th>
 	
 	
-	<th th:fragment="page_link(pageNum, pageLabel)">
-		<a class="page-link" th:href="@{'/users/page/' + ${pageNum} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">
+	<th th:fragment="page_link(moduleURL, pageNum, pageLabel)">
+		<a class="page-link" th:href="@{${moduleURL} + '/page/' + ${pageNum} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">
 			[[${pageLabel}]]
 		</a>
 	</th>
 	
+	
+	<div th:fragment="category_status">
+		<a th:if="${category.enabled == true}"
+			th:href="@{'/categories/' + ${category.id} + '/enabled/false'}">
+			<i class="fas fa-circle-check fa-2x icon green"></i>
+		</a>
+		
+		<a th:if="${category.enabled != true}"
+			th:href="@{'/categories/' + ${category.id} + '/enabled/true'}">
+			<i class="fas fa-circle-check fa-2x icon-silver"></i>
+		</a>
+			
+	</div>
+	
+	<div th:fragment="category_actions" th:remove="tag">
+		<a th:href="@{'/categories/edit/' + ${category.id}}">
+			<i class="fa fa-2x fa-pen-to-square icon-green"></i>
+		</a>
+		&nbsp;
+		<th:block th:if="${category.hasChildren == false}">
+		<a th:href="@{'/categories/delete/' + ${category.id}}" 
+			class="delete-category"  th:categoryId="${category.id}">
+			<i class="fa fa-2x fa-trash icon-silver"></i>
+		</a>
+		</th:block>
+	</div>
+	
+	<div th:fragment="pagination(moduleURL, entityName)" th:remove="tag">
+		<div class="text-center m-1" th:if="${totalItems > 0}">
+		<span>Showing [[${entityName}]] # [[${startCount}]]  to [[${endCount}]] of [[${totalItems}]]</span>
+		</div>
+		<div class="text-center m-1" th:if="${totalItems < 0}">
+			<span>No [[${entityName}]] found</span>
+		</div>
+	
+	<div th:if="${totalPages > 1}">
+		<nav>
+		  <ul class="pagination justify-content-center">
+		    <li th:class="${currentPage > 1 ? 'page-item': 'page-item disabled'}">
+		   		<a th:replace="fragments :: page_link(${moduleURL},'1', 'First')"></a>
+		    </li>
+		    <li th:class="${currentPage > 1 ? 'page-item': 'page-item disabled'}">
+		    	<a th:replace="fragments :: page_link(${moduleURL} ,${currentPage - 1}, '<')"></a>
+		    </li>
+		  	<li th:class="${currentPage != i ? 'page-item': 'page-item active'}"
+		  		th:each="i : ${#numbers.sequence(1, totalPages)}">
+		    	<a th:replace="fragments :: page_link(${moduleURL} ,${i}, ${i})"></a>
+		    </li>
+		    <li th:class="${currentPage < totalPages ? 'page-item': 'page-item disabled'}">
+		    	<a th:replace="fragments :: page_link(${moduleURL} ,${currentPage + 1}, '>')"></a>
+		    </li>
+		    <li th:class="${currentPage < totalPages ? 'page-item': 'page-item disabled'}">
+		    	<a th:replace="fragments :: page_link(${moduleURL}, ${totalPages}, 'Last')"></a> 
+		    </li>
+		  </ul>
+		</nav>
+	</div>
+	
+	</div>
 	
 	<div th:fragment="footer" class="text-center"> 
 		<p>Websales Control Panel - Copyright</p>
