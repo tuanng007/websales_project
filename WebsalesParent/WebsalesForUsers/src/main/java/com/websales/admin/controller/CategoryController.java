@@ -21,10 +21,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.websales.admin.FileUploadUtil;
 import com.websales.admin.exception.CategoryNotFoundException;
+import com.websales.admin.export.CategoryCsvExporter;
 import com.websales.admin.service.CategoryPageInfo;
 import com.websales.admin.service.CategoryService;
 import com.websales.admin.service.UserService;
 import com.websales.common.entity.Category;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class CategoryController {
@@ -157,5 +160,12 @@ public class CategoryController {
 		redirectAttributes.addFlashAttribute("message","The category has been saved successfully");
 		
 		return "redirect:/categories";
+	}
+	
+	@GetMapping("/categories/export/csv")
+	public void exportToCSV(HttpServletResponse re) throws IOException { 
+		List<Category> listCategories = categoryService.listCategoriesInForm();
+		CategoryCsvExporter exporter = new CategoryCsvExporter();
+		exporter.export(listCategories, re);
 	}
  }
