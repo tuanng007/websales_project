@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 
@@ -138,7 +141,22 @@ public class CategoryRepositoryTest {
 		assertThat(category.getAlias()).isEqualTo(alias);
 	}
 	
-	
+	@Test
+	public void testSearchCategory() { 
+		String keyword = "C";
+		
+		int pageNum = 0;
+		int pageSize = 4;
+		
+		Pageable pageable = PageRequest.of(pageNum, pageSize);
+		Page<Category> page = categoryRepo.search(keyword, pageable);
+		
+		List<Category> listCategories = page.getContent();
+		
+		listCategories.forEach(cat -> System.out.println(cat.getName()));
+		
+		assertThat(listCategories.size()).isGreaterThan(0);
+	}
 	
 	
 }

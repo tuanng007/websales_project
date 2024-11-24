@@ -23,6 +23,7 @@ import com.websales.admin.FileUploadUtil;
 import com.websales.admin.exception.CategoryNotFoundException;
 import com.websales.admin.service.CategoryPageInfo;
 import com.websales.admin.service.CategoryService;
+import com.websales.admin.service.UserService;
 import com.websales.common.entity.Category;
 
 @Controller
@@ -33,17 +34,31 @@ public class CategoryController {
 	
 	@GetMapping("/categories")
 	public String listFirstPage(@Param("sortDir") String sortDir, Model model) {
-		return  listCategoryByPage(1, sortDir, model);
+		return  listCategoryByPage(1, sortDir, null ,model);
 	}
 	
 	@GetMapping("/categories/page/{pageNum}")
-	public String listCategoryByPage(@PathVariable("pageNum") int pageNum, @Param("sortDir") String sortDir, Model model) { 
+	public String listCategoryByPage(
+			@PathVariable("pageNum") int pageNum,
+			@Param("sortDir") String sortDir, 
+			@Param("keyword") String keyword,
+			Model model) { 
+		
 		if(sortDir == null || sortDir.isEmpty()) { 
 			sortDir = "asc";
 		}
-		CategoryPageInfo pageInfo = new CategoryPageInfo();
 		
-		List<Category> listCategories = categoryService.listByPage(pageInfo, pageNum, sortDir);
+		
+		CategoryPageInfo pageInfo = new CategoryPageInfo();
+		List<Category> listCategories = categoryService.listByPage(pageInfo, pageNum, sortDir, keyword);
+
+		
+		long startCount = (pageNum - 1) * CategoryService.CATEGORIES_PER_PAGE + 1;
+		long endCount = startCount + CategoryService.CATEGORIES_PER_PAGE - 1;
+		if(endCount > pageInfo.getTotalElements()) { 
+			endCount = pageInfo.getTotalElements();
+		}
+		
 		
 		String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
 		
@@ -52,6 +67,9 @@ public class CategoryController {
 		model.addAttribute("totalItems", pageInfo.getTotalElements());
 		model.addAttribute("sortDir", sortDir);
 		model.addAttribute("sortField", "name");
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("startCount", startCount);
+		model.addAttribute("endCount", endCount);
 		model.addAttribute("reverseSortDir", reverseSortDir);
 		model.addAttribute("listCategories", listCategories);
  		

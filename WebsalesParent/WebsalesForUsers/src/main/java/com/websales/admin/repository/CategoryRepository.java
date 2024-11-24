@@ -22,11 +22,15 @@ public interface CategoryRepository extends PagingAndSortingRepository<Category,
 	@Query("SELECT cat FROM Category cat WHERE cat.parent.id is NULL")
 	public Page<Category> findRootCategories(Pageable pageable);
 	
+	@Query("SELECT cat FROM Category cat WHERE cat.name LIKE %?1%")
+	public Page<Category> search(String keyword, Pageable pageable);
+	
 	public Long countById(Integer id);
 	
 	public Category findByName(String name);
 	
 	public Category findByAlias(String alias);
+	
 	
 	@Query("UPDATE Category cat SET cat.enabled = ?2 WHERE cat.id = ?1")
 	@Modifying

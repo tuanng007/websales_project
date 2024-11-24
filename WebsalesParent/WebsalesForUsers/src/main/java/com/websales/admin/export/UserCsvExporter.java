@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class UserCsvExporter extends AbstractExporter{
 	
 	public void export(List<User> listUsers, HttpServletResponse response) throws IOException {
-		super.setResponseHeader(response, "text/csv", ".csv");
+		super.setResponseHeader(response, "text/csv", ".csv" , "_user");
 		
 		ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
 		

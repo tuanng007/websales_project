@@ -30,6 +30,29 @@
 		</a>
 	</th>
 	
+	<div th:fragment="search_bar(moduleURL)">
+		<form th:action="@{${moduleURL} +'/page/' + '1'}" class="form-inline m-3">
+			<input type="hidden" name="sortField" th:value="${sortField}"/>
+			<input type="hidden" name="sortDir" th:value="${sortDir}"/>
+			Search:&nbsp;
+			<input type="search" name="keyword" th:value="${keyword}" class="form-control" required>
+			&nbsp;&nbsp;
+			<input type="submit" value="Search" class="btn btn-primary"/>
+			&nbsp;&nbsp;
+			<input type="button" value="Clear" class="btn btn-secondary" onclick="clearSearch()"/>
+		</form>
+	</div>
+	
+	<div th:fragment="new-export(moduleURL)">
+		<a th:href="@{${moduleURL} + '/new'}"><i class="fa fa-plus fa-2x icon-silver"></i></a>
+		&nbsp;|&nbsp;
+		<a th:href="@{${moduleURL} + '/export/csv'}"><i class="fa fa-file-csv fa-2x icon-silver"></i></a>
+		&nbsp;|&nbsp;
+		<a th:href="@{${moduleURL} + '/export/excel'}"><i class="fa fa-file-excel fa-2x icon-silver"></i></a>
+		&nbsp;|&nbsp;
+		<a th:href="@{${moduleURL} + '/export/pdf'}"><i class="fa fa-file-pdf fa-2x icon-silver"></i></a>
+	</div>
+	
 	
 	<div th:fragment="category_status">
 		<a th:if="${category.enabled == true}"
@@ -69,20 +92,20 @@
 		<nav>
 		  <ul class="pagination justify-content-center">
 		    <li th:class="${currentPage > 1 ? 'page-item': 'page-item disabled'}">
-		   		<a th:replace="fragments :: page_link(${moduleURL},'1', 'First')"></a>
+		   		<a th:replace="~{fragments :: page_link(${moduleURL},'1', 'First')}"></a>
 		    </li>
 		    <li th:class="${currentPage > 1 ? 'page-item': 'page-item disabled'}">
-		    	<a th:replace="fragments :: page_link(${moduleURL} ,${currentPage - 1}, '<')"></a>
+		    	<a th:replace="~{fragments :: page_link(${moduleURL} ,${currentPage - 1}, '<')}"></a>
 		    </li>
 		  	<li th:class="${currentPage != i ? 'page-item': 'page-item active'}"
 		  		th:each="i : ${#numbers.sequence(1, totalPages)}">
-		    	<a th:replace="fragments :: page_link(${moduleURL} ,${i}, ${i})"></a>
+		    	<a th:replace="~{fragments :: page_link(${moduleURL} ,${i}, ${i})}"></a>
 		    </li>
 		    <li th:class="${currentPage < totalPages ? 'page-item': 'page-item disabled'}">
-		    	<a th:replace="fragments :: page_link(${moduleURL} ,${currentPage + 1}, '>')"></a>
+		    	<a th:replace="~{fragments :: page_link(${moduleURL} ,${currentPage + 1}, '>')}"></a>
 		    </li>
 		    <li th:class="${currentPage < totalPages ? 'page-item': 'page-item disabled'}">
-		    	<a th:replace="fragments :: page_link(${moduleURL}, ${totalPages}, 'Last')"></a> 
+		    	<a th:replace="~{fragments :: page_link(${moduleURL}, ${totalPages}, 'Last')}"></a> 
 		    </li>
 		  </ul>
 		</nav>

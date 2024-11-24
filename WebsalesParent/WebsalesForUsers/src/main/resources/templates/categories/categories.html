@@ -12,29 +12,9 @@
 		[[${message}]]
 	</div>
 	
-	<div>
-		<form th:action="@{/categories/page/1}" class="form-inline m-3">
-			<input type="hidden" name="sortField" th:value="${sortField}"/>
-			<input type="hidden" name="sortDir" th:value="${sortDir}"/>
-			Search:&nbsp;
-			<input type="search" name="keyword" th:value="${keyword}" class="form-control" required>
-			&nbsp;&nbsp;
-			<input type="submit" value="Search" class="btn btn-primary"/>
-			&nbsp;&nbsp;
-			<input type="button" value="Clear" class="btn btn-secondary" onclick="clearSearch()"/>
-		</form>
-	</div>
+	<div th:replace="~{fragments :: search_bar('/categories')}"></div>
 	
-	
-	<div>
-		<a th:href="@{/categories/new}"><i class="fa fa-plus fa-2x icon-silver"></i></a>
-		&nbsp;|&nbsp;
-		<a th:href="@{/categories/export/csv}"><i class="fa fa-file-csv fa-2x icon-silver"></i></a>
-		&nbsp;|&nbsp;
-		<a th:href="@{/categories/export/excel}"><i class="fa fa-file-excel fa-2x icon-silver"></i></a>
-		&nbsp;|&nbsp;
-		<a th:href="@{/categories/export/pdf}"><i class="fa fa-file-pdf fa-2x icon-silver"></i></a>
-	</div>
+	<div th:replace="~{fragments :: new-export('/categories')}"></div>
 	
 	<div>
 		<table class="table table-responsive-xl table-bordered table-striped">
