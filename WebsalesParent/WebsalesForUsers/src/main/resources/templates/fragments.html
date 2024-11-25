@@ -11,10 +11,11 @@
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 	<script type="text/javascript" th:src="@{/js/common.js}"></script>
+	<script type="text/javascript" th:src="@{/js/common_form.js}"></script>
 	
 </head>
 <body>
-	<th th:fragment="column_link(moduleURL,fieldName, columnLabel)">
+	<th th:fragment="column_link(moduleURL,fieldName, columnLabel , removeTag)"  th:remove="${removeTag}">
 		<a class="text-white" 
 			th:href="@{${moduleURL} + '/page/' + ${currentPage} + '?sortField=' + ${fieldName} + '&sortDir=' + ${sortField != fieldName ? sortDir : reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 			[[${columnLabel}]]
@@ -54,27 +55,36 @@
 	</div>
 	
 	
-	<div th:fragment="category_status">
-		<a th:if="${category.enabled == true}"
-			th:href="@{'/categories/' + ${category.id} + '/enabled/false'}">
-			<i class="fas fa-circle-check fa-2x icon green"></i>
+	<div th:fragment="status(enabled, entityName, moduleURL)" th:remove="tag">
+		<a th:if="${enabled == true}"
+			th:href="@{${moduleURL} + '/enabled/false'}"
+			th:title="'Disable this ' + ${entityName}">
+			<i class="fas fa-circle-check fa-2x icon-green"></i>
 		</a>
 		
-		<a th:if="${category.enabled != true}"
-			th:href="@{'/categories/' + ${category.id} + '/enabled/true'}">
+		
+		<a th:if="${enabled == false}"
+			th:href="@{${moduleURL} + '/enabled/true'}"
+			th:title="'Enable this ' + ${entityName}">
 			<i class="fas fa-circle-check fa-2x icon-silver"></i>
 		</a>
 			
 	</div>
 	
-	<div th:fragment="category_actions" th:remove="tag">
-		<a th:href="@{'/categories/edit/' + ${category.id}}">
+	<div th:fragment="edit(entityName, moduleURL)" th:remove="tag">
+		<a th:href="@{${moduleURL}}"
+			th:title="'Edit this' + ${entityName}">
 			<i class="fa fa-2x fa-pen-to-square icon-green"></i>
 		</a>
-		&nbsp;
-		<th:block th:if="${category.hasChildren == false}">
-		<a th:href="@{'/categories/delete/' + ${category.id}}" 
-			class="delete-category"  th:categoryId="${category.id}">
+	</div>
+	
+	<div th:fragment="delete(entityName, entityID, moduleURL, subStatement)" th:remove="tag">
+		<th:block th:if="${subStatement}">
+		<a th:href="@{${moduleURL}}" 
+			class="link-delete" 
+			 th:entityName="${entityName}"
+			 th:entityID="${entityID}"
+			 th:title="'Delete this' + ${entityName}">
 			<i class="fa fa-2x fa-trash icon-silver"></i>
 		</a>
 		</th:block>

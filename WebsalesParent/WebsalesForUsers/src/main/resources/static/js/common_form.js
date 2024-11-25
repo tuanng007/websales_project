@@ -34,6 +34,19 @@
 		};
 		reader.readAsDataURL(file);
 	}
-	
+
+$(document).ready(function(){
+	$(".link-delete").on("click", function(e){
+		e.preventDefault();
+		link = $(this);
+		entityName = link.attr("entityName");
+		entityID= link.attr("entityID"); 		
+		$("#yesButton").attr("href", link.attr("href"));
+		$("#modalBody").text("Are you sure you want to delete this " + entityName + " ID " + entityID + " ?");
+		let myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
+		myModal.show();
+	});
+});
+
 
 	

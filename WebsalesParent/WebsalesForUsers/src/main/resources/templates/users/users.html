@@ -5,7 +5,10 @@
 	
 </head>
 <body>
-	<div th:replace="~{navigation :: menu}"></div>
+<div class="container-fluid">
+
+<div th:replace="~{navigation :: menu}"></div>
+
 	<div>
 		<h2>Manage Users</h2>
 	</div>
@@ -18,17 +21,24 @@
 	
 	<div th:replace="~{fragments :: new-export('/users')}"></div>
 	
-	<div>
-		<table class="table table-responsive-xl table-bordered table-striped">
+	<div class="full-details">
+		<table class="table  table-bordered table-striped table-hover table-responsive-xl">
 			<thead class="table-dark"> 
 				<tr>
-					<th th:replace="~{fragments :: column_link('/users','id','User ID')}" />
+					<th class="hideable-column">
+						<th th:replace="~{fragments :: column_link('/users','id','User ID','tag')}" />
+					</th>
+					
 					<th>Photos</th>
-					<th th:replace="~{fragments :: column_link('/users','email','Email')}" />
-					<th th:replace="~{fragments :: column_link('/users','firstName','First name')}" />
-					<th th:replace="~{fragments :: column_link('/users','lastName','Last name')}" />
+					
+					<th class="hideable-column">
+						<th th:replace="~{fragments :: column_link('/users','email','Email','tag')}" />
+					</th>
+					
+					<th th:replace="~{fragments :: column_link('/users','firstName','First name','none')}" />
+					<th th:replace="~{fragments :: column_link('/users','lastName','Last name','none')}" />
 					<th>Roles</th>
-					<th th:replace="~{fragments :: column_link('/users','enabled','Enabled')}" />
+					<th th:replace="~{fragments :: column_link('/users','enabled','Enabled','none')}" />
 						
 					<th> </th>
 				</tr>
@@ -36,38 +46,47 @@
 			
 			<tbody>
 				<tr th:each="user : ${listUsers}"> 
-					<td>[[${user.id}]]</td>
+					<td class="hideable-column">[[${user.id}]]</td>
 					<td>
 						<span th:if="${user.photos == null}"  class="fa fa-portrait fa-3x"></span>
-						<img th:if="${user.photos != null}" th:src="@{${user.getPhotosImagePath}}">
+						<img th:if="${user.photos != null}" th:src="@{${user.getPhotosImagePath}}" style="width: 100px">
 					</td>
 					<td>[[${user.email}]]</td>
 					<td>[[${user.firstName}]]</td>
 					<td>[[${user.lastName}]]</td>
 					<td>[[${user.roles}]]</td>
 					<td>
-						<a th:if="${user.enabled == true}" 
-							th:href="@{'/users/' + ${user.id} + '/enabled/false'}">
-							<i class="fas fa-circle-check fa-2x icon-green"></i>
-						</a>
-						<a th:if="${user.enabled == false}" 
-							th:href="@{'/users/' + ${user.id} + '/enabled/true'}">
-							<i class="fas fa-circle-check fa-2x icon-silver"></i>
-						</a>
+						<div th:replace="~{fragments ::status(${user.enabled}, 'user', '/users/' + ${user.id})}"></div>
 					</td>
 					<td>
-						<a th:href="@{'/users/edit/' + ${user.id}}">
-							<i class="fa fa-2x fa-pen-to-square icon-green"></i>
-						</a>
-						&nbsp;
-						<a th:href="@{'/users/delete/' + ${user.id}}" class="delete-user" th:userId="${user.id}">
-							<i class="fa fa-2x fa-trash icon-silver"></i>
-						</a>
-
+						<div th:replace="~{fragments :: edit('user', '/users/edit/' + ${user.id})}"></div>
+						<div th:replace="~{fragments :: delete('user', ${user.id},'/users/delete/' + ${user.id} , true)}"></div>	
 					 </td>
 				</tr>
 			</tbody>
 		</table>
+	</div>
+	
+	<div class="less-details">
+		<div th:each="user : ${listUsers}" class="row m-1">
+			<div class="col-4">
+				<span th:if="${user.photos == null}"  class="fa fa-portrait fa-3x"></span>
+				<img th:if="${user.photos != null}" th:src="@{${user.getPhotosImagePath}}"
+					style="width: 100px"/>
+			</div>
+			
+			<div class="col-8">
+				<div>[[${user.fullName}]]</div>
+				<div>[[${user.roles}]]</div>
+				<div>
+					<div th:replace="~{fragments ::status(${user.enabled}, 'user', '/users/' + ${user.id})}"></div>
+					&nbsp;
+					<div th:replace="~{fragments :: edit('user', '/users/edit/' + ${user.id})}"></div>
+					&nbsp;
+					<div th:replace="~{fragments :: delete('user', ${user.id},'/users/delete/' + ${user.id} , true)}"></div>
+				</div>
+			</div>
+		</div>
 	</div>
 	
 	<div th:replace="~{fragments :: pagination('/users', 'user')}"></div>
@@ -75,20 +94,9 @@
 	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
 	
 	<div th:replace="~{fragments :: footer}"></div>
-	
+</div>	
 <script type="text/javascript">
-$(document).ready(function(){
-	$(".delete-user").on("click", function(e){
-		e.preventDefault();
-		link = $(this);
-		userId = link.attr("userId"); 		
-		$("#yesButton").attr("href", link.attr("href"));
-		$("#modalBody").text("Are you sure you want to delete this user ID " + userId + " ?");
-		let myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
-		myModal.show();
-	});
-});
-
+	
 	function clearSearch() { 
 		window.location = "[[@{/users}]]"
 	}
