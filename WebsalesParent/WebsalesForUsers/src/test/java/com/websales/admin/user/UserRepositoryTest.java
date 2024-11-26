@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
 
-import com.websales.admin.repository.UserRepository;
 import com.websales.common.entity.Role;
 import com.websales.common.entity.User;
 

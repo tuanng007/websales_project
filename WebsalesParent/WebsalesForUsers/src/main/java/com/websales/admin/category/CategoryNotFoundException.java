@@ -1,4 +1,4 @@
-package com.websales.admin.exception;
+package com.websales.admin.category;
 
 public class CategoryNotFoundException extends Exception {
 	public CategoryNotFoundException(String message) { 

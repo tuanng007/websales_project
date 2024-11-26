@@ -1,4 +1,4 @@
-package com.websales.admin.controller;
+package com.websales.admin.user;
 
 import java.io.IOException;
 
@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.websales.admin.FileUploadUtil;
 import com.websales.admin.security.WebSalesUserDetails;
-import com.websales.admin.service.UserService;
 import com.websales.common.entity.User;
 
 @Controller

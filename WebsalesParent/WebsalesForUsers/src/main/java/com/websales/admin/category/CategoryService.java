@@ -1,4 +1,4 @@
-package com.websales.admin.service;
+package com.websales.admin.category;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.websales.admin.exception.CategoryNotFoundException;
-import com.websales.admin.repository.CategoryRepository;
 import com.websales.common.entity.Category;
 
 import jakarta.transaction.Transactional;

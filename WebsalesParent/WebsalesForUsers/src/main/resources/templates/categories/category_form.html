@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: page_head(${pageTitle})}"></head>
 <body>
+<div class="container-fluid">
 	<div th:replace="~{navigation :: menu}"></div>
 	
 	<div>
@@ -70,10 +71,10 @@
 		
 	
 	</form>	
-	
-	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
-	
+		
 	<div th:replace="~{fragments :: footer}"></div>
+</div>
+	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
 	
 <script type="text/javascript">
 	moduleURL = "[[@{/categories}]]"
@@ -113,7 +114,6 @@
 		showModalDialog("Warning", message);
 	}
 </script>
-<script th:src="@{/js/common_form.js}"></script>
 
 </body>
 </html>

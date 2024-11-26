@@ -1,4 +1,4 @@
-package com.websales.admin.exception;
+package com.websales.admin.user;
 
 public class UserNotFoundException extends Exception {
 	public UserNotFoundException(String message) { 

@@ -46,6 +46,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authz -> authz
             		.requestMatchers("/users/**")
             		.hasAuthority("Admin")
+            		.requestMatchers("/categories/**", "/brands/**").hasAnyAuthority("Admin", "Storekeeper")
             		.anyRequest()
             		.authenticated()
             )

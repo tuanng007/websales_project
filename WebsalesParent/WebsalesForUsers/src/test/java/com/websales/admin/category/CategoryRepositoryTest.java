@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 
-import com.websales.admin.repository.CategoryRepository;
 import com.websales.common.entity.Category;
 
 @DataJpaTest(showSql = false)

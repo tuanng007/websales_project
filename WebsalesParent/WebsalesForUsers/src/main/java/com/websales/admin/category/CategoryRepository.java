@@ -1,4 +1,4 @@
-package com.websales.admin.repository;
+package com.websales.admin.category;
 
 import java.util.List;
 

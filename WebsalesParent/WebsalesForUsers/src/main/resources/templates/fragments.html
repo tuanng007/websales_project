@@ -17,7 +17,7 @@
 <body>
 	<th th:fragment="column_link(moduleURL,fieldName, columnLabel , removeTag)"  th:remove="${removeTag}">
 		<a class="text-white" 
-			th:href="@{${moduleURL} + '/page/' + ${currentPage} + '?sortField=' + ${fieldName} + '&sortDir=' + ${sortField != fieldName ? sortDir : reSort} + ${keyword != null ? '&keyword=' + keyword : ''}}">
+			th:href="@{${moduleURL} + '/page/' + ${currentPage} + '?sortField=' + ${fieldName} + '&sortDir=' + ${sortField != fieldName ? sortDir : reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}">
 			[[${columnLabel}]]
 		</a>
 		<span th:if="${sortField == fieldName}"
@@ -84,7 +84,7 @@
 			class="link-delete" 
 			 th:entityName="${entityName}"
 			 th:entityID="${entityID}"
-			 th:title="'Delete this' + ${entityName}">
+			 th:title="'Delete this ' + ${entityName}">
 			<i class="fa fa-2x fa-trash icon-silver"></i>
 		</a>
 		</th:block>

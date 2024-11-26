@@ -1,4 +1,4 @@
-package com.websales.admin.service;
+package com.websales.admin.user;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -11,9 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.websales.admin.exception.UserNotFoundException;
-import com.websales.admin.repository.RoleRepository;
-import com.websales.admin.repository.UserRepository;
 import com.websales.common.entity.Role;
 import com.websales.common.entity.User;
 

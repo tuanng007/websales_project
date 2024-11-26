@@ -1,4 +1,4 @@
-package com.websales.admin.controller;
+package com.websales.admin.category;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,11 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.websales.admin.FileUploadUtil;
-import com.websales.admin.exception.CategoryNotFoundException;
 import com.websales.admin.export.CategoryCsvExporter;
-import com.websales.admin.service.CategoryPageInfo;
-import com.websales.admin.service.CategoryService;
-import com.websales.admin.service.UserService;
+import com.websales.admin.user.UserService;
 import com.websales.common.entity.Category;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +39,7 @@ public class CategoryController {
 	
 	@GetMapping("/categories/page/{pageNum}")
 	public String listCategoryByPage(
-			@PathVariable("pageNum") int pageNum,
+			@PathVariable(name ="pageNum") int pageNum,
 			@Param("sortDir") String sortDir, 
 			@Param("keyword") String keyword,
 			Model model) { 

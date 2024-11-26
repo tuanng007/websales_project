@@ -1,4 +1,4 @@
-package com.websales.admin.service;
+package com.websales.admin.category;
 
 public class CategoryPageInfo {
 	private int totalPages;

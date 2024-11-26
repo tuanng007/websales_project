@@ -1,4 +1,4 @@
-package com.websales.admin.controller;
+package com.websales.admin.user;
 
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
@@ -19,11 +19,9 @@ import org.springframework.web.service.annotation.PatchExchange;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.websales.admin.FileUploadUtil;
-import com.websales.admin.exception.UserNotFoundException;
 import com.websales.admin.export.UserCsvExporter;
 import com.websales.admin.export.UserExcelExporter;
 import com.websales.admin.export.UserPdfExporter;
-import com.websales.admin.service.UserService;
 import com.websales.common.entity.Role;
 import com.websales.common.entity.User;
 
@@ -53,7 +51,7 @@ public class UserController {
 			endCount = page.getTotalElements();
 		}
 		
-		String reSort = sortDir.equals("asc") ? "desc" : "asc"; 
+		String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc"; 
 		
 		model.addAttribute("currentPage", pageNum);
 		model.addAttribute("totalPages", page.getTotalPages());
@@ -62,7 +60,7 @@ public class UserController {
 		model.addAttribute("totalItems", page.getTotalElements());
 		model.addAttribute("sortField", sortField);
 		model.addAttribute("sortDir", sortDir);
-		model.addAttribute("reSort", reSort);
+		model.addAttribute("reverseSortDir", reverseSortDir);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("listUsers", listUsers);
 		
