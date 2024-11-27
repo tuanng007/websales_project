@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: page_head('Manage Products')}"></head>
+<body>
+<div class="container-fluid">
+	<div th:replace="~{navigation :: menu}"></div>
+	
+	<div>
+		<h2>Manage Products</h2>
+	</div>
+	
+	<div th:if="${message != null}" class="alert alert-success text-center">
+		[[${message}]]
+	</div>
+	
+	<div th:replace="~{fragments :: search_bar('/products')}"></div>
+	
+	<div th:replace="~{fragments :: new-export('/products')}"></div>
+	
+	<div class="full-details">
+		<table class="table  table-bordered table-striped table-hover table-responsive-xl">
+			<thead class="table-dark"> 
+				<tr>
+					<th>Product ID</th>
+	
+					<th>Product Image</th>
+					
+					<th th:replace="~{fragments :: column_link('/products', ${sortField},'Product Name','none')}" />
+
+					<th>Brand</th>
+					
+					<th>Category</th>
+					
+					<th>Enabled</th>
+					
+					<th></th>
+				</tr>
+			</thead>
+			
+			<tbody>
+				<tr th:each="product : ${listProducts}"> 
+					<td>[[${product.id}]]</td>
+					<td>
+						<span class="fa fa-portrait fa-3x"></span>
+					</td>
+					<td>[[${product.name}]]</td>
+					<td>[[${product.brand}]]</td>
+					<td>[[${product.category}]]</td>
+					<td>
+						<div th:replace="~{fragments :: status(${product.enabled}, 'product', '/products/' + ${product.id})}"></div>
+					</td>
+					<td>
+						<a th:href="@{'/products/detail/' + ${product.id}}">
+							<i class="fas fa-file fa-2x icon-green"></i>
+						</a>
+						&nbsp;
+						<div th:replace="~{fragments :: edit('product', '/products/edit/' + ${product.id})}"></div>
+						&nbsp;
+						<div th:replace="~{fragments :: delete('product', ${product.id},'/products/delete/' + ${product.id} , true)}"></div>	
+					 </td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div class="less-details">
+		<div th:each="product : ${listProducts}" class="row m-1">
+			<div class="col-4">
+				<span class="fa fa-portrait fa-3x"></span>				
+			</div>
+			
+			<div class="col-8">
+				<div>[[${product.name}]]</div>
+				<div><div>
+					<div th:replace="~{fragments :: status(${product.enabled}, 'product', '/products/' + ${product.id})}"></div>
+					&nbsp;
+					<a th:href="@{'/products/detail/' + ${product.id}}">
+						<i class="fas fa-file fa-2x icon-green"></i>
+					</a>
+					&nbsp;
+					<div th:replace="~{fragments :: edit('product', '/products/edit/' + ${product.id})}"></div>
+						&nbsp;
+					<div th:replace="~{fragments :: delete('product', ${product.id},'/products/delete/' + ${product.id} , true)}"></div>	
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	</div>
+	
+	
+	<div th:replace="~{fragments :: pagination('/products', 'product')}"></div>
+	
+	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
+	
+	<div th:replace="~{fragments :: footer}"></div>
+</div>
+</body>
+
+<script type="text/javascript">
+
+function clearSearch() { 
+	window.location = "[[@{/products}]]"
+}
+</script>
+</html>
