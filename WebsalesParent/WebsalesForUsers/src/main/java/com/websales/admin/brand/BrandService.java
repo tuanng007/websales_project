@@ -38,7 +38,7 @@ public class BrandService {
 		
 		
 		if(keyword != null) { 
-			return brandRepo.search(keyword, pageable);
+			return brandRepo.findAll(keyword, pageable);
 		} else {
 			return  brandRepo.findAll(pageable);
 		}

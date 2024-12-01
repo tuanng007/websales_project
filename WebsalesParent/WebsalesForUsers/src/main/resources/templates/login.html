@@ -7,6 +7,15 @@
 <title>Login-Websales</title>
 </head>
 <body>
+<!--  
+<div>
+	<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+			<a class="navbar-brand" th:href="@{/}"> 
+				<img th:src="@{/images/ShopmeAdminSmall.png}"/>
+			</a>
+	</nav>
+</div>
+-->
 <div class="container-fluid text-center ">
 	<form th:action="@{/login}" method="post" style="max-width: 350px; margin: 0 auto">
 		<div th:if="${param.error}">

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="content" th:remove="tag">
+		<div class="form-group row p-2">
+			<label class="col-sm-4 col-form-label">Product Name:</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" th:field="*{name}" id="name" required>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2" >
+			<label class="col-sm-4 col-form-label">Alias:</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" th:field="*{alias}" id="alias" required>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2">
+			<label class="col-sm-4 col-form-label">Brand:</label>
+			<div class="col-sm-8">
+				<select th:field="*{brand}" class="form-control" required>
+					<th:block th:each="brand : ${listBrands}">
+						<option th:value="${brand.id}">[[${brand.name}]]</option>
+					</th:block>
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2">
+			<label class="col-sm-4 col-form-label">Category:</label>
+			<div class="col-sm-8">
+				<select th:field="*{category}" class="form-control" required>
+				
+				</select>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2" >
+			<label class="col-sm-4 col-form-label">Enabled:</label>
+			<div class="col-sm-8">
+				<input type="checkbox"  th:field="*{enabled}" id="enabled" required>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2" >
+			<label class="col-sm-4 col-form-label">Stock:</label>
+			<div class="col-sm-8">
+				<input type="checkbox"  th:field="*{inStock}" id="stock" required>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2" >
+			<label class="col-sm-4 col-form-label">Cost:</label>
+			<div class="col-sm-8">
+				<input type="number" class="form-control" th:field="*{cost}" id="cost" required>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2" >
+			<label class="col-sm-4 col-form-label">List Price:</label>
+			<div class="col-sm-8">
+				<input type="number" class="form-control" th:field="*{price}" id="price" required>
+			</div>
+		</div>
+		
+		<div class="form-group row p-2" >
+			<label class="col-sm-4 col-form-label">Discount:</label>
+			<div class="col-sm-8">
+				<input type="number" class="form-control" th:field="*{discountPercent}" id="discount" required>
+			</div>
+		</div>
+		
+		<div class="text-center p-2">
+			<input class="btn btn-primary" type="submit" value="Save"/>
+			<input class="btn btn-secondary" type="button" value="Cancel" id="buttonCancel"/>
+		</div>
+	</div>
+</body>
+</html>
