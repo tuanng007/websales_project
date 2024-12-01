@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.websales.admin.brand.BrandService;
@@ -47,6 +48,28 @@ public class ProductController {
 		model.addAttribute("pageTitle", "Create New Product");
 		
 		return "/products/product_form";
+	}
+	
+	@GetMapping("/products/delete/{id}")
+	public String deleteProduct(@PathVariable("id") Integer id, RedirectAttributes re) throws ProductNotFound { 
+		try { 
+			proService.delete(id);
+			re.addFlashAttribute("message", "The product id: " + id + " has been deleted");
+		} catch (ProductNotFound e) {
+			re.addFlashAttribute("message", e);
+		}
+		return "redirect:/products";
+	}
+	
+	@GetMapping("/products/{id}/enabled/{status}")
+	public String changeEnabledStatus(@PathVariable("id") Integer id, @PathVariable("status") boolean enabled, RedirectAttributes re) {
+		
+		proService.updateEnabledStatus(id, enabled);
+		
+		String status = enabled ? "enabled" : "disabled";
+		
+		re.addFlashAttribute("message", "The product id: "  + id + " has been " + status);
+		return "redirect:/products";
 	}
 	
 	 @PostMapping("/products/save")
