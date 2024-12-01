@@ -12,6 +12,7 @@ import com.websales.admin.brand.BrandService;
 import com.websales.common.entity.Brand;
 import com.websales.common.entity.Product;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 @Controller
@@ -49,10 +50,10 @@ public class ProductController {
 	}
 	
 	 @PostMapping("/products/save")
-	 public String saveProduct(Product product) {
-		 System.out.println("Product Name: " + product.getName());
-		 System.out.println("Product Brand: " + product.getBrand().getId());
-		 System.out.println("Product Category: " + product.getCategory().getId());
+	 public String saveProduct(Product product, RedirectAttributes re) {
+		 proService.save(product);
+		 re.addFlashAttribute("message", "The product has been saved successfully!");
+		 
 	 	return "redirect:/products";
 	 }
 	 
