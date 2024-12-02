@@ -41,7 +41,7 @@
 				<tr th:each="product : ${listProducts}"> 
 					<td>[[${product.id}]]</td>
 					<td>
-						<span class="fa fa-portrait fa-3x"></span>
+						<img class="img-fluid" style="width: 300px" th:src="@{${product.getMainImagePath}}">
 					</td>
 					<td>[[${product.name}]]</td>
 					<td>[[${product.brand}]]</td>

@@ -1,39 +1,48 @@
-	$(document).ready(function() {
-		$("#buttonCancel").on("click", function() { 
-			window.location = moduleURL;
-		});	
+$(document).ready(function() {
+	$("#buttonCancel").on("click", function() { 
+		window.location = moduleURL;
+	});	
+	
+	$("#fileImage").on("change", function() {
+		if(!checkFileSize(this)) { 
+			return;
+		}
 		
-		$("#fileImage").on("change", function() {
-			fileSize = this.files[0].size;
-			alert("File size: " + fileSize);
-			
-			if(fileSize > 1048576){
-				this.setCustomValidity("You must choose an image less than 1MB!");
-				this.reportValidity();
-			}else {
-				this.setCustomValidity("");
-				showImageThumbnail(this);
-			}
-			
-		});
+		showImageThumbnail(this);
+		
 	});
+});
+
+
+function checkFileSize(fileInput) { 
+	fileSize = fileInput.files[0].size;
 	
-	
-	function showModalDialog(title, message) {
-		$("#modalTitle").text(title);
-		$("#modalBody").text(message);
-		 var myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
-	     myModal.show();
+	if(fileSize > MAX_FILE_SIZE){
+		fileInput.setCustomValidity("You must choose an image less than " + MAX_FILE_SIZE + " bytes!");
+		fileInput.reportValidity();
+		
+		return false;
+	} else  { 
+		fileInput.setCustomValidity("");
+		return true;		
 	}
+}
 	
-	function showImageThumbnail(fileInput) {
-		var file = fileInput.files[0];
-		var reader = new FileReader();
-		reader.onload = function(e) { 
-			$("#thumbnail").attr("src", e.target.result);
-		};
-		reader.readAsDataURL(file);
-	}
+function showModalDialog(title, message) {
+	$("#modalTitle").text(title);
+	$("#modalBody").text(message);
+	 var myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
+     myModal.show();
+}
+
+function showImageThumbnail(fileInput) {
+	var file = fileInput.files[0];
+	var reader = new FileReader();
+	reader.onload = function(e) { 
+		$("#thumbnail").attr("src", e.target.result);
+	};
+	reader.readAsDataURL(file);
+}
 
 $(document).ready(function(){
 	$(".link-delete").on("click", function(e){

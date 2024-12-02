@@ -26,6 +26,10 @@
 		    <a class="nav-link"  data-bs-toggle="tab" href="#description" role="tab">Description</a>
 		  </li>
 		  
+		   <li class="nav-item">
+		    <a class="nav-link"  data-bs-toggle="tab" href="#image" role="tab">Image</a>
+		  </li>
+		  
 		  <li class="nav-item">
 		    <a class="nav-link"  data-bs-toggle="tab" href="#shipping" role="tab">Shipping</a>
 		  </li>
@@ -35,8 +39,12 @@
 		  <div class="tab-pane fade show active" id="overview" role="tabpanel" >
 		  		<div th:replace = "~{products/product_overview :: content}"></div>
 		  </div>
+		
 		  <div class="tab-pane fade" id="description" role="tabpanel" >
 		  		<div th:replace="~{products/product_description :: content}"></div>
+		  </div>
+		  <div class="tab-pane fade" id="image" role="tabpanel" >
+		  		<div th:replace = "~{products/product_images :: content}"></div>
 		  </div>
 		  <div class="tab-pane fade" id="shipping" role="tabpanel" >
 		  		<div th:replace="~{products/product_shipping :: content}"></div>
@@ -48,76 +56,16 @@
 	<div th:replace="~{fragments :: footer}"></div>
 		<div th:replace="~{modal_fragments :: modal_dialog}"></div>
 </div>
+<script type="text/javascript" >
+MAX_FILE_SIZE = 502400;
+moduleURL = "[[@{/products}]]";
 
-	
-<script type="text/javascript">
-	moduleURL = "[[@{/products}]]";
-	
-	brandModuleURL = "[[@{/brands}]]";
-	
-	dropdownBrands = $("#brand");
-	dropdownCategories = $("#category");
-	
-	$(document).ready(function(){
-		
-		$("#shortDescription").richText();
-		$("#fullDescription").richText();
+brandModuleURL = "[[@{/brands}]]";
 
-		
-		dropdownBrands.change(function() {
-			dropdownCategories.empty();
-			getCategories();
-		});
-		getCategories();
-
-	});
-	
-	function getCategories() { 
-		brandId = dropdownBrands.val();
-		url = brandModuleURL + "/" + brandId + "/categories";
-		
-		$.get(url, function(responseJson){
-			$.each(responseJson, function(index, category) {
-				$("<option>").val(category.id).text(category.name).appendTo(dropdownCategories);
-			})
-		});
-	}
-	
-
+checkUniqueURL = "[[@{/products/check_unique}]]";
 </script>
-<script type="text/javascript">
-function checkNameUnique(form)  {
-	url = "[[@{/products/check_unique}]]";
-	productId = $("#id").val();
-	productName = $("#name").val();
-	csrfValue = $("input[name='_csrf']").val();
+<script th:src="@{/js/common_form.js}"></script>
 	
-	params = {id: productId, name: productName, _csrf: csrfValue};
-	
-	$.post(url, params, function(response) { 
-		if(response == "OK") { 
-			form.submit();
-		} else if(response == "Duplicate") { 
-			showWarningModal("There is another product having this name: " + productName);
-		} else { 
-			showErrorModal("Fail response from the server");
-		}
-	}).fail(function() { 
-		showErrorModal("Could not connect the server ");
-
-	});
-	return false;
-}
-
-function showErrorModal(message) { 
-	showModalDialog("Error", message);
-}
-
-function showWarningModal(message) { 
-	showModalDialog("Warning", message);
-}
-
-	
-</script>
+<script th:src="@{/js/product_form.js}"></script>
 </body>
 </html>

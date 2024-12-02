@@ -112,7 +112,7 @@ public class BrandController {
 	public String deleteBrand(@PathVariable("id") Integer id, RedirectAttributes re) throws BrandNotFoundException  {
 		try {
 			brandService.delete(id);
-			String brandDir = "../brand-logos/";
+			String brandDir = "../brand-logos/" + id;
 			FileUploadUtil.removeDir(brandDir);
 			
 			re.addFlashAttribute("message", "The brand ID: " + id + " has been deleted successfully");
