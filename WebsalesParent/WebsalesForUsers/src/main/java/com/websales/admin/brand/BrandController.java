@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.websales.admin.FileUploadUtil;
 import com.websales.admin.category.CategoryNotFoundException;
 import com.websales.admin.category.CategoryService;
+import com.websales.admin.paging.PagingAndSortingHelper;
+import com.websales.admin.paging.PagingAndSortingParam;
 import com.websales.admin.user.UserService;
+import com.websales.admin.util.FileUploadUtil;
 import com.websales.common.entity.Brand;
 import com.websales.common.entity.Category;
 
@@ -34,52 +36,25 @@ public class BrandController {
 	@Autowired
 	private CategoryService categoryService;
 	
+	private String redirectDefaultURL = "redirect:/brands/page/1?sortField=name&sortDir=asc";
+	
 	@GetMapping("/brands")
-	public String viewFirstPage(@Param("sortDir") String sortDir, Model model) {
-		return listByPage(1, sortDir, null, model);
+	public String viewFirstPage() {
+		return redirectDefaultURL;
 	}
 	
 	
 	@GetMapping("/brands/page/{pageNum}")
-	public String listByPage(@PathVariable("pageNum") int pageNum, 
-			@Param("sortDir") String sortDir,
-			@Param("keyword") String keyword, 
-			Model model) { 		
+	public String listByPage(@PagingAndSortingParam(listName = "listBrands", moduleURL = "/brands") PagingAndSortingHelper helper,
+			@PathVariable("pageNum") int pageNum) { 		
 		
-		if(sortDir == null || sortDir.isEmpty()) { 
-			sortDir = "asc";
-		}
-		
-		
-		Page<Brand> pageBrand = brandService.listByPage(pageNum, sortDir, keyword);
-		List<Brand> listBrands = pageBrand.getContent();
-		
-		long startCount = (pageNum - 1) * BrandService.BRANDS_PER_PAGE + 1;
-		long endCount = startCount + BrandService.BRANDS_PER_PAGE - 1;
-		if(endCount > pageBrand.getTotalElements()) { 
-			endCount = pageBrand.getTotalElements();
-		}
-		
-		String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc";
-		
-		model.addAttribute("currentPage", pageNum);
-		model.addAttribute("totalPages", pageBrand.getTotalPages());
-		model.addAttribute("startCount", startCount);
-		model.addAttribute("endCount", endCount);
-		model.addAttribute("totalItems", pageBrand.getTotalElements());
-		model.addAttribute("sortField", "name");
-		model.addAttribute("sortDir", sortDir);
-		model.addAttribute("reverseSortDir", reverseSortDir);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("listBrands", listBrands);
-		
-		
+		brandService.listByPage(pageNum, helper);
 		return "/brands/brands";
 	}
 	
 	@GetMapping("/brands/new")
 	public String newBrand(Model model)  {
-		List<Category> listCategories = categoryService.listCategoriesInForm();
+		List<Category> listCategories = categoryService.listCategoriesUsedInForm();
 		Brand brand = new Brand();
 		
 		model.addAttribute("listCategories", listCategories);
@@ -93,7 +68,7 @@ public class BrandController {
 	public String editBrand(@PathVariable("id") Integer id, Model model, RedirectAttributes re) throws BrandNotFoundException {
 		try { 
 			Brand brand = brandService.get(id);
-			List<Category> listCategories = categoryService.listCategoriesInForm();
+			List<Category> listCategories = categoryService.listCategoriesUsedInForm();
 			
 			model.addAttribute("brand", brand);
 			model.addAttribute("listCategories", listCategories);

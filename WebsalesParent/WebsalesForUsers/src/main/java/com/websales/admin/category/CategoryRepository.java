@@ -24,15 +24,14 @@ public interface CategoryRepository extends PagingAndSortingRepository<Category,
 	
 	@Query("SELECT cat FROM Category cat WHERE cat.name LIKE %?1%")
 	public Page<Category> search(String keyword, Pageable pageable);
+		
+	@Query("UPDATE Category cat SET cat.enabled = ?2 WHERE cat.id = ?1")
+	@Modifying
+	public void updateEnabledStatus(Integer id, boolean enabled);
 	
 	public Long countById(Integer id);
 	
 	public Category findByName(String name);
 	
 	public Category findByAlias(String alias);
-	
-	
-	@Query("UPDATE Category cat SET cat.enabled = ?2 WHERE cat.id = ?1")
-	@Modifying
-	public void updateEnabledStatus(Integer id, boolean enabled);
 }

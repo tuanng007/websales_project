@@ -1,5 +1,6 @@
 package com.websales.admin.brand;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -10,81 +11,78 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.websales.admin.paging.PagingAndSortingHelper;
 import com.websales.common.entity.Brand;
 import com.websales.common.entity.Category;
 
+import jakarta.transaction.Transactional;
+
 @Service
-public class BrandService {
+@Transactional
+public class BrandService implements IBrandService{
 	
-	public static final int BRANDS_PER_PAGE = 4;
-	
-	
+	public static final int BRANDS_PER_PAGE = 10;
+
 	@Autowired
-	private BrandRepository brandRepo;
+	private BrandRepository repo;
 	
+	@Override
 	public List<Brand> listAll() {
-		return (List<Brand>) brandRepo.findAll();
-	}
+		// TODO Auto-generated method stub
+		
+		Sort firstNameSorting =  Sort.by("name").ascending();
+		
+		List<Brand> brandList = new ArrayList<>();
+		repo.findAll(firstNameSorting).forEach(brandList::add);
+		return brandList;
 	
-	public Page<Brand> listByPage(int pageNum, String sortDir, String keyword) { 
-		Sort sort = Sort.by("name");
-		
-		if(sortDir.equals("asc")) { 
-			sort = sort.ascending();
-		} else if(sortDir.equals("desc")) { 
-			sort = sort.descending();
-		}
-		Pageable pageable = PageRequest.of(pageNum - 1, BRANDS_PER_PAGE, sort);
-		
-		
-		if(keyword != null) { 
-			return brandRepo.findAll(keyword, pageable);
-		} else {
-			return  brandRepo.findAll(pageable);
-		}
-		
-		
 	}
-	
-	public Brand get(Integer id) throws BrandNotFoundException{
+
+	@Override
+	public Brand save(Brand brand) {
+		return repo.save(brand);
+	}
+
+	@Override
+	public Brand get(Integer id) throws BrandNotFoundException {
 		try {
-			return brandRepo.findById(id).get();
-		} catch (NoSuchElementException e) {
-			throw new BrandNotFoundException("Could not find any Brand with ID: " + id);
+			return repo.findById(id).get();
+		} catch (NoSuchElementException ex) {
+			throw new BrandNotFoundException("Could not find any brand with ID " + id);
 		}
 	}
-	
-	public void delete(Integer id) throws BrandNotFoundException { 
-		Long brandById = brandRepo.countById(id);
-	
-		if(brandById == 0 || brandById == null) { 
-			throw new BrandNotFoundException("Could not find nay Brand with ID: " + id);
-		} else { 
-			brandRepo.deleteById(id);
+
+	@Override
+	public void delete(Integer id) throws BrandNotFoundException {
+		Long countById = repo.countById(id);
+
+		if (countById == null || countById == 0) {
+			throw new BrandNotFoundException("Could not find any brand with ID " + id);			
 		}
-	
+
+		repo.deleteById(id);
 	}
-	
+
+	@Override
 	public String checkUnique(Integer id, String name) {
+		// TODO Auto-generated method stub
 		boolean isCreatingNew = (id == null || id == 0);
-		
-		Brand brandByName = brandRepo.findByName(name);
-		
-		if(isCreatingNew) { 
-			if(brandByName != null) { 
-				return "Duplicate";
-			}
-		} else  { 
-			if(brandByName != null && brandByName.getId() != id) {
+		Brand brandByName = repo.findByName(name);
+
+		if (isCreatingNew) {
+			if (brandByName != null) return "Duplicate";
+		} else {
+			if (brandByName != null && brandByName.getId() != id) {
 				return "Duplicate";
 			}
 		}
-			
+
 		return "OK";
 	}
-	
-	public Brand save(Brand brand) {
-		return brandRepo.save(brand);
+
+	@Override
+	public void listByPage(int pageNum, PagingAndSortingHelper helper) {
+		helper.listEntities(pageNum, BRANDS_PER_PAGE, repo);
 	}
-	
 }
+

@@ -1,128 +1,130 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: page_head('Brand Form','none')}">
-</head>
+<head th:replace="fragments :: page_head(${pageTitle}, 'none')" />
 <body>
 <div class="container-fluid">
-	<div th:replace="~{navigation :: menu}"></div>
-	
+	<div th:replace="navigation :: menu"></div>
 	<div>
-		<h2>Manage Brands | [[${pageTitle}]]</h2>
+		<h2>[[#{brand.managemessage}]] | [[${pageTitle}]]</h2>	
 	</div>
-		
-	<form th:action="@{/brands/save}" method="post" style="max-width: 700px; margin: 0 auto"
-		 th:object="${brand}" onsubmit="return checkNameUnique(this)"
-		 enctype="multipart/form-data">
-		 <input type="hidden" th:field="*{id}" id="id">
-		<div class="border border-primary rounded p-3">
-			<div class="form-group row p-2">
-				<label class="col-sm-4 col-form-label">Brand Name:</label>
-				<div class="col-sm-8">
-					<input type="text" class="form-control" th:field="*{name}" id="name" required>
-				</div>
-			</div>
 
-			<div class="form-group row p-2">
-				<label class="col-sm-4 col-form-label">Brand Logo:</label>
-				<div class="col-sm-8">
-					<input type="hidden" th:field="*{logo}" />
-					<input type="file"  id = "fileImage" name="fileImage" accept="image/png, image/jpeg"/>
-					<img id="thumbnail" class="img-fluid" th:src="@{${brand.getLogoPath}}" style="width: 200px">
-				</div>
-			</div>
-			
-			<div class="form-group row p-2">
-				<label class="col-sm-4 col-form-label">Select one or more categories</label>
-				<div class="col-sm-8">
-					<select class="form-control" 
-						th:field="*{categories}" multiple required
-						style="resize: vertical; height: 200px">
-						<th:block th:each="cat : ${listCategories}">
-							<option th:value="${cat.id}">[[${cat.name}]]</option>
-						</th:block>	
-					</select>
-				</div>
-			</div>
-			
-			<div class="form-group row p-2">
-			    <label class="col-sm-4 col-form-label">Chosen categories:</label>
-			    <div class="col-sm-8" id="chosenCategories">
-			        <!-- Chosen categories will be displayed here -->
-			    </div>
-			</div>
-
-			
-			<div class="text-center p-2">
-				<input class="btn btn-primary" type="submit" value="Save"/>
-				<input class="btn btn-secondary" type="button" value="Cancel" id="buttonCancel"/>
+	<form th:action="@{/brands/save}" method="post" style="max-width: 500px; margin: 0 auto"
+		enctype="multipart/form-data" onsubmit="return checkUnique(this)"
+		th:object="${brand}">
+		<input type="hidden" th:field="*{id}" />
+	<div class="border border-secondary rounded p-3">
+		<div class="form-group row">
+			<label class="col-sm-4 col-form-label">[[#{brand.name}]]</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" th:field="*{name}" required minlength="3" maxlength="45"  />
 			</div>
 		</div>
-	
-	</form>
-	
-	<div th:replace="~{modal_fragments :: modal_dialog}"></div>
 
-	<div th:replace="~{fragments :: footer}"> </div>
+		<div class="form-group row">
+			<label class="col-sm-4 col-form-label">[[#{brand.logo}]]</label>
+			<div class="col-sm-8">
+				<input type="hidden" th:field="*{logo}" />
+				<input type="file" id="fileImage" name="fileImage" accept="image/png, image/jpeg"
+					th:required="${brand.id == null}"
+					class="mb-2" />
+
+				<div class="mt-2">
+					<img id="thumbnail" alt="Image preview" th:src="@{${brand.getLogoPath()}}"
+						class="img-fluid" />
+				</div>
+			</div>
+		</div>		
+
+		<div class="form-group row">
+			<label class="col-sm-4 col-form-label">[[#{brand.category}]]</label>
+			<div class="col-sm-8">
+				<select class="form-control" th:field="*{categories}" multiple required
+						style="resize: vertical; height: 200px">
+					<th:block th:each="cat : ${listCategories}">
+					<option th:value="${cat.id}">[[${cat.name}]]</option>
+					</th:block>
+
+				</select>
+			</div>
+		</div>		
+
+		<div class="form-group row">
+			<label class="col-sm-4 col-form-label">[[#{brand.selectedcategory}]]</label>
+			<div class="col-sm-8">
+				<div id="chosenCategories">
+				
+				</div>
+			</div>
+		</div>
+
+		<div class="text-center">
+			<input type="submit" th:value="#{brand.savebutton}" class="btn btn-primary m-3" />
+			<input type="button" th:value="#{brand.cancelbutton}" class="btn btn-secondary" id="buttonCancel" />
+		</div>
+	</div>
+	</form>
+
+	<div th:replace="modal_fragments :: modal_dialog"></div>
+
+	<div th:replace="fragments :: footer"></div>
+
 </div>
 <script type="text/javascript">
-		MAX_FILE_SIZE = 102400;
-	
-		moduleURL = "[[@{/brands}]]"
-		
-		function checkNameUnique(form)  {
-			url = "[[@{/brands/check_name}]]";
-			brandId = $("#id").val();
-			brandName = $("#name").val();
-			csrfValue = $("input[name='_csrf']").val();
-			params = {id: brandId, name: brandName, _csrf: csrfValue};
-			
-			$.post(url, params, function(response) {
-				if(response == "OK") {
-					form.submit();
-				} else if(response == "Duplicate") {
-					showWarningModal("There is another brand having this name " + brandName); 
-				} else{
-					showErrorModal( "Fail response from the server");
-				}
-			}).fail(function() {
-				showErrorModal("Could not connect the server ");
-			});
-			 
-			return false;
-		}
-		
-		function showErrorModal(message) { 
-			showModalDialog("Error", message);
-		}
-		
-		function showWarningModal(message)  {
-			showModalDialog("Warning", message);
-		}	
 
-		
-</script>
-<script type="text/javascript">
-$(document).ready(function(){
-	dropdownCategories = $("#categories");
-	divChosenCatgories = $("#chosenCategories");
+	MAX_FILE_SIZE = 102400; // 100KB
+
+	moduleURL = "[[@{/brands}]]";
+
 	
-	dropdownCategories.change(function(){
-		divChosenCatgories.empty();
+	$(document).ready(function() {
+		dropdownCategories = $("#categories");
+		divChosenCategories = $("#chosenCategories");
+
+		dropdownCategories.change(function() {
+			divChosenCategories.empty();
+			showChosenCategories();
+		});
+		
 		showChosenCategories();
 	});
-});
 
-function showChosenCategories(){ 
-	dropdownCategories.children("option:selected").each(function(){
-		selectedCategory = $(this);
-		catId = selectedCategory.val();
-		catName = selectedCategory.text();
-		
-		divChosenCatgories.append("<span class='badge bg-info text-dark m-1'>" + catName + "</span>");
-	})
-}
+	function showChosenCategories(){
+			dropdownCategories.children("option:selected").each(function(){
+				selectedCategory = $(this);
+				catId = selectedCategory.val();
+				catName = selectedCategory.text().replace(/-/g, "");
+				
+				divChosenCategories.append("<span class='badge badge-secondary m-1'>" + catName + "</span>");
+			});
+		}
+	
+	function checkUnique(form) {
+		brandId = $("#id").val();
+		brandName = $("#name").val();
+
+		csrfValue = $("input[name='_csrf']").val();
+
+		url = "[[@{/brands/check_unique}]]";
+
+		params = {id: brandId, name: brandName, _csrf: csrfValue};
+
+		$.post(url, params, function(response) {
+			if (response == "OK") {
+				form.submit();
+			} else if (response == "Duplicate") {
+				showWarningModal("There is another brand having same name " + brandName);	
+			} else {
+				showErrorModal("Unknown response from server");
+			}
+
+		}).fail(function() {
+			showErrorModal("Could not connect to the server");
+		});
+
+		return false;
+	}
+	
 </script>
-
-
+<script th:src="@{/js/common_form.js}"></script>
 </body>
-</html>
+</html> 

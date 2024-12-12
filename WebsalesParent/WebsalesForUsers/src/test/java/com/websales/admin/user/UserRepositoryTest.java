@@ -59,11 +59,11 @@ public class UserRepositoryTest {
 		listUsers.forEach(user -> System.out.println(user));
 	}
 	
-	@Test
-	public void deleteUser() { 
-		Integer userId = 2;
-		userRepo.deleteById(userId);
-	}
+//	@Test
+//	public void deleteUser() { 
+//		Integer userId = 2;
+//		userRepo.deleteById(userId);
+//	}
 	
 	@Test
 	public void getUserByEmail() { 

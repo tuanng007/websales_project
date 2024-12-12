@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="cod_support" th:remove="tag">
+	<a th:if="${rate.codSupported}" class="fas fa-hand-holding-usd fa-2x icon-green" 
+		th:href="@{'/shipping_rates/cod/' + ${rate.id} + '/enabled/false'}"
+		th:title="#{shipping.cod.unsupportedmessage}"
+		></a>
+
+	<a th:unless="${rate.codSupported}" class="fas fa-hand-holding-usd fa-2x icon-dark" 
+		th:href="@{'/shipping_rates/cod/' + ${rate.id} + '/enabled/true'}"
+		th:title="#{shipping.cod.supportedmessage}"
+		></a>	
+</div>
+</body>
+</html> 

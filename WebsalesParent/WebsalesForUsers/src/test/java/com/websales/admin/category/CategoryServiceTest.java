@@ -32,7 +32,7 @@ public class CategoryServiceTest {
 		Mockito.when(cateRepo.findByName(name)).thenReturn(category);
 		Mockito.when(cateRepo.findByAlias(alias)).thenReturn(null);
 		
-		String result = cateService.checkUniqueCategory(id, name, alias);
+		String result = cateService.checkUnique(id, name, alias);
 		assertThat(result).isEqualTo("DupicateName"); 
 	}
 	
@@ -47,7 +47,7 @@ public class CategoryServiceTest {
 		Mockito.when(cateRepo.findByName(name)).thenReturn(null);
 		Mockito.when(cateRepo.findByAlias(alias)).thenReturn(category);
 		
-		String result = cateService.checkUniqueCategory(id, name, alias);
+		String result = cateService.checkUnique(id, name, alias);
 		assertThat(result).isEqualTo("DuplicateAlias");
 	}
 	
@@ -62,7 +62,7 @@ public class CategoryServiceTest {
 		Mockito.when(cateRepo.findByName(name)).thenReturn(null);
 		Mockito.when(cateRepo.findByAlias(alias)).thenReturn(category);
 		
-		String result = cateService.checkUniqueCategory(id, name, alias);
+		String result = cateService.checkUnique(id, name, alias);
 		assertThat(result).isEqualTo("OK");
 	}
 }

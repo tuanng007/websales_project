@@ -2,53 +2,53 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0,">
-	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-<title>Login-Websales</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0">
+
+	<title>[[#{login.message}]]</title>
+
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
 </head>
 <body>
-<!--  
-<div>
-	<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
-			<a class="navbar-brand" th:href="@{/}"> 
-				<img th:src="@{/images/ShopmeAdminSmall.png}"/>
-			</a>
-	</nav>
-</div>
--->
-<div class="container-fluid text-center ">
-	<form th:action="@{/login}" method="post" style="max-width: 350px; margin: 0 auto">
-		<div th:if="${param.error}">
-			<p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+
+	<div class="container-fluid text-center">
+	
+		<div>
+			<h1>HI-TECH STORE</h1>
 		</div>
+	
+		<form th:action="@{/login}" method="post" style="max-width: 350px; margin: 0 auto">
 		
-			<div th:if="${param.logout}">
-			<p class="text-warning">You have been logged out</p>
-		</div>
-		
-		<div class = "border border-secondary rounded p-3">
-			<p>Login to Websalse Admin</p>
-			<p>
-				<input type="email" name="email" class="form-control" placeholder="E-mail" required>
-			</p>
+			<div th:if="${param.error}">
+				<p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+			</div>
 			
-			<p>
-				<input type="password" name="password" class="form-control" placeholder="Password" required>
-			</p>
-			<p>
-				<input type="checkbox" name="remember-me">&nbsp; Remember me
-			</p>
-			<p>
-				<input type="submit" value="Login" class="btn btn-primary">
-			</p>
-		</div>
-	</form>
-
-
-	<div th:replace="~{fragments :: footer}">
+			<div th:if="${param.logout}">
+				<p class="text-warning">[[#{logout.message}]]</p>
+			</div>
 		
+		
+			<div class="border border-secondary rounded p-3">
+				<p>[[#{login.logintitle}]]</p>
+				<p>
+					<input type="email" name="email" class="form-control" th:placeholder="#{email.placeholder}" required />
+				</p>
+				<p>
+					<input type="password" name="password" class="form-control" th:placeholder="#{password.placeholder}" required />
+				</p>
+				<p>
+					<input type="checkbox" name="remember-me" />&nbsp;[[#{login.remembermessage}]]
+				</p>
+				<p>
+					<input type="submit" th:value="#{login.button}" class="btn btn-primary" />
+				</p>			
+			</div>
+		</form>
+	
+		<div>
+			<p>[[#{login.copyright.front}]] &copy; [[#{login.copyright.end}]]</p>
+		</div>
+	
 	</div>
 	
-</div>
 </body>
 </html>

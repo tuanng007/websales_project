@@ -1,8 +1,7 @@
-/*!
+/*
  RichText: WYSIWYG editor developed as jQuery plugin
 
  @name RichText
- @version 1.1.0
  @author https://github.com/webfashionist - Bob Schockweiler - richtext@webfashion.eu
  @license GNU AFFERO GENERAL PUBLIC LICENSE Version 3
  @preserve
@@ -30,6 +29,7 @@
         // set default options
         // and merge them with the parameter options
         var settings = $.extend({
+
             // text formatting
             bold: true,
             italic: true,
@@ -64,7 +64,6 @@
                 "Verdana"
             ],
             fontColor: true,
-            backgroundColor: true,
             fontSize: true,
 
             // uploads
@@ -139,13 +138,12 @@
                 'alignLeft': 'Align left',
                 'alignCenter': 'Align centered',
                 'alignRight': 'Align right',
-                'addOrderedList': 'Ordered list',
-                'addUnorderedList': 'Unordered list',
-                'addHeading': 'Heading/title',
-                'addFont': 'Font',
-                'addFontColor': 'Font color',
-                'addBackgroundColor': 'Background color',
-                'addFontSize': 'Font size',
+                'addOrderedList': 'Add ordered list',
+                'addUnorderedList': 'Add unordered list',
+                'addHeading': 'Add Heading/title',
+                'addFont': 'Add font',
+                'addFontColor': 'Add font color',
+                'addFontSize': 'Add font size',
                 'addImage': 'Add image',
                 'addVideo': 'Add video',
                 'addFile': 'Add file',
@@ -155,35 +153,22 @@
                 'code': 'Show HTML code',
                 'undo': 'Undo',
                 'redo': 'Redo',
-                'save': 'Save',
                 'close': 'Close'
             },
 
             // privacy
             youtubeCookies: false,
 
-            // preview
-            preview: false,
-
-            // placeholder
-            placeholder: '',
-
             // dev settings
             useSingleQuotes: false,
             height: 0,
             heightPercentage: 0,
-            adaptiveHeight: false,
             id: "",
             class: "",
             useParagraph: false,
             maxlength: 0,
-            maxlengthIncludeHTML: false,
             callback: undefined,
-            useTabForNext: false,
-            save: false,
-            saveCallback: undefined,
-            saveOnBlur: 0,
-            undoRedo: true
+            useTabForNext: false
 
         }, options);
 
@@ -261,13 +246,8 @@
             $btnFontColor = $('<a />', {
                 class: "richText-btn",
                 "title": settings.translations.addFontColor,
-                html: '<span class="fa fa-pencil fa-pencil-alt"></span>'
-            }), // font color
-            $btnBackgroundColor = $('<a />', {
-                class: "richText-btn",
-                "title": settings.translations.addBackgroundColor,
                 html: '<span class="fa fa-paint-brush"></span>'
-            }), // background color
+            }), // font color
             $btnFontSize = $('<a />', {
                 class: "richText-btn",
                 "title": settings.translations.addFontSize,
@@ -309,12 +289,6 @@
                 "data-command": "toggleCode",
                 "title": settings.translations.code,
                 html: '<span class="fa fa-code"></span>'
-            }),
-            $btnSave = $('<a />', {
-                class: "save-btn",
-                "data-command": "toggleSave",
-                "title": settings.translations.save,
-                html: '<span class="fa fa-save"></span>'
             }); // code
 
 
@@ -324,7 +298,6 @@
             class: "richText-dropdown-close",
             html: '<span title="' + settings.translations.close + '"><span class="fa fa-times"></span></span>'
         });
-        $dropdownOuter.prepend($dropdownClose.clone());
         var $dropdownList = $('<ul />', {class: "richText-dropdown"}), // dropdown lists
             $dropdownBox = $('<div />', {class: "richText-dropdown"}), // dropdown boxes / custom dropdowns
             $form = $('<div />', {class: "richText-form"}), // symbolic form
@@ -333,7 +306,7 @@
             $formInput = $('<input />', {type: "text"}), //form input field
             $formInputFile = $('<input />', {type: "file"}), // form file input field
             $formInputSelect = $('<select />'),
-            $formButton = $('<button />', {text: settings.translations.add, class: "btn", type: "button"}); // button
+            $formButton = $('<button />', {text: settings.translations.add, class: "btn"}); // button
 
         /* internal settings */
         var savedSelection; // caret position/selection
@@ -352,7 +325,7 @@
         $titles.append($('<li />', {html: '<a data-command="formatBlock" data-option="h2">' + settings.translations.title + ' #2</a>'}));
         $titles.append($('<li />', {html: '<a data-command="formatBlock" data-option="h3">' + settings.translations.title + ' #3</a>'}));
         $titles.append($('<li />', {html: '<a data-command="formatBlock" data-option="h4">' + settings.translations.title + ' #4</a>'}));
-        $btnHeading.append($dropdownOuter.clone().append($titles));
+        $btnHeading.append($dropdownOuter.clone().append($titles.prepend($dropdownClose.clone())));
 
         /* list dropdown for fonts */
         var fonts = settings.fontList;
@@ -360,24 +333,26 @@
         for (var i = 0; i < fonts.length; i++) {
             $fonts.append($('<li />', {html: '<a style="font-family:' + fonts[i] + ';" data-command="fontName" data-option="' + fonts[i] + '">' + fonts[i] + '</a>'}));
         }
-        $btnFont.append($dropdownOuter.clone().append($fonts));
+        $btnFont.append($dropdownOuter.clone().append($fonts.prepend($dropdownClose.clone())));
 
         /* list dropdown for font sizes */
+        var fontSizes = [24, 18, 16, 14, 12];
         var $fontSizes = $dropdownList.clone();
-        for (let fontSize = 24; fontSize >= 12; fontSize -= 2) {
-            $fontSizes.append($('<li />', {html: '<a style="font-size:' + fontSize + 'px;" data-command="fontSize" data-option="' + fontSize + '">' + settings.translations.text + ' ' + fontSize + 'px</a>'}));
+        for (var i = 0; i < fontSizes.length; i++) {
+            $fontSizes.append($('<li />', {html: '<a style="font-size:' + fontSizes[i] + 'px;" data-command="fontSize" data-option="' + fontSizes[i] + '">' + settings.translations.text + ' ' + fontSizes[i] + 'px</a>'}));
         }
-        $btnFontSize.append($dropdownOuter.clone().append($fontSizes));
+        $btnFontSize.append($dropdownOuter.clone().append($fontSizes.prepend($dropdownClose.clone())));
 
         /* font colors */
         var $fontColors = $dropdownList.clone();
         $fontColors.html(loadColors("forecolor"));
-        $btnFontColor.append($dropdownOuter.clone().append($fontColors));
+        $btnFontColor.append($dropdownOuter.clone().append($fontColors.prepend($dropdownClose.clone())));
+
 
         /* background colors */
-        var $backgroundColors = $dropdownList.clone();
-        $backgroundColors.html(loadColors("hiliteColor"));
-        $btnBackgroundColor.append($dropdownOuter.clone().append($backgroundColors));
+        //var $bgColors = $dropdownList.clone();
+        //$bgColors.html(loadColors("hiliteColor"));
+        //$btnBGColor.append($dropdownOuter.clone().append($bgColors));
 
         /* box dropdown for links */
         var $linksDropdown = $dropdownBox.clone();
@@ -404,7 +379,7 @@
         );
         $linksForm.append($formItem.clone().append($formButton.clone()));
         $linksDropdown.append($linksForm);
-        $btnURLs.append($dropdownOuter.clone().append($linksDropdown));
+        $btnURLs.append($dropdownOuter.clone().append($linksDropdown.prepend($dropdownClose.clone())));
 
         /* box dropdown for video embedding */
         var $videoDropdown = $dropdownBox.clone();
@@ -429,7 +404,7 @@
         );
         $videoForm.append($formItem.clone().append($formButton.clone()));
         $videoDropdown.append($videoForm);
-        $btnVideoEmbed.append($dropdownOuter.clone().append($videoDropdown));
+        $btnVideoEmbed.append($dropdownOuter.clone().append($videoDropdown.prepend($dropdownClose.clone())));
 
         /* box dropdown for image upload/image selection */
         var $imageDropdown = $dropdownBox.clone();
@@ -460,7 +435,7 @@
         }
         $imageForm.append($formItem.clone().append($formButton.clone()));
         $imageDropdown.append($imageForm);
-        $btnImageUpload.append($dropdownOuter.clone().append($imageDropdown));
+        $btnImageUpload.append($dropdownOuter.clone().append($imageDropdown.prepend($dropdownClose.clone())));
 
         /* box dropdown for file upload/file selection */
         var $fileDropdown = $dropdownBox.clone();
@@ -485,7 +460,7 @@
         }
         $fileForm.append($formItem.clone().append($formButton.clone()));
         $fileDropdown.append($fileForm);
-        $btnFileUpload.append($dropdownOuter.clone().append($fileDropdown));
+        $btnFileUpload.append($dropdownOuter.clone().append($fileDropdown.prepend($dropdownClose.clone())));
 
         /* box dropdown for tables */
         var $tableDropdown = $dropdownBox.clone();
@@ -502,7 +477,7 @@
         );
         $tableForm.append($formItem.clone().append($formButton.clone()));
         $tableDropdown.append($tableForm);
-        $btnTable.append($dropdownOuter.clone().append($tableDropdown));
+        $btnTable.append($dropdownOuter.clone().append($tableDropdown.prepend($dropdownClose.clone())));
 
 
         /* initizalize editor */
@@ -557,90 +532,13 @@
 
             $editor = $('<div />', {class: "richText"});
             var $toolbar = $('<div />', {class: "richText-toolbar"});
-            var $editorView = $('<div />', {class: "richText-editor", id: editorID, contenteditable: !settings.preview});
-
-            $editorView.on('clear', () => {
-                var $editor = $('#' + editorID);
-                $editor.siblings('.richText-initial').val('<div><br></div>')
-                $editor.html($editor.siblings('.richText-initial').val());
-            });
-
-            $editorView.on('setContent', (event, content) => {
-                var $editor = $('#' + editorID);
-                $editor.siblings('.richText-initial').val(content)
-                $editor.html($editor.siblings('.richText-initial').val());
-            });
-
-            $editorView.on('getContent', (event, callback) => {
-                if (typeof callback !== 'function') {
-                    return;
-                }
-                callback($editorView.siblings('.richText-initial').val());
-            });
-
-            $editorView.on('save', (event, callback) => {
-                $editorView.trigger('change');
-                if (typeof settings.saveCallback === 'function') {
-                    settings.saveCallback($editor, 'save', getEditorContent(editorID));
-                }
-            });
-
-            $editorView.on('destroy', (event, options) => {
-                const destroy = () => {
-                    let $main = $editorView.parents('.richText');
-                    $main.find('.richText-toolbar').remove();
-                    $main.find('.richText-editor').remove();
-                    const $textarea = $main.find('.richText-initial')
-                    $textarea
-                        .unwrap('.richText')
-                        .data('editor', 'richText')
-                        .removeClass('richText-initial')
-                        .show();
-                    if (options && typeof options.callback === 'function') {
-                        options.callback($textarea);
-                    }
-                }
-                if (options && options.delay) {
-                    setTimeout(() => {
-                        destroy();
-                    }, options.delay);
-                    return;
-                }
-                destroy();
-            });
-
+            var $editorView = $('<div />', {class: "richText-editor", id: editorID, contenteditable: true});
             var tabindex = $inputElement.prop('tabindex');
             if (tabindex >= 0 && settings.useTabForNext === true) {
                 $editorView.attr('tabindex', tabindex);
             }
-            if (!settings.preview) {
-                $toolbar.append($toolbarList);
-            }
-            if (settings.placeholder) {
-                if (!$editorView.text().length) {
-                    $editorView.attr('placeholder', settings.placeholder);
-                    $editorView.on('focus', function () {
-                        $editorView.removeAttr('placeholder');
-                    });
-
-                    $editorView.on('focusout blur', function () {
-                        if (this.hasAttribute('placeholder')) {
-                            return;
-                        }
-                        if ($(this).text().length) {
-                            return;
-                        }
-                        $(this).attr('placeholder', settings.placeholder);
-                    });
-                }
-            }
-
+            $toolbar.append($toolbarList);
             settings.$editor = $editor;
-            settings.blurTriggered = false;
-            settings.$editor.on('click', () => {
-                // click within the editor => reset blur event
-                settings.blurTriggered = false;
-            });
 
             /* text formatting */
             if (settings.bold === true) {
@@ -688,14 +586,9 @@
                 $toolbarList.append($toolbarElement.clone().append($btnHeading));
             }
 
-            /* font colors */
+            /* colors */
             if (settings.fontColor === true) {
                 $toolbarList.append($toolbarElement.clone().append($btnFontColor));
-            }
-
-            /* background colors */
-            if (settings.backgroundColor === true) {
-                $toolbarList.append($toolbarElement.clone().append($btnBackgroundColor));
             }
 
             /* uploads */
@@ -727,13 +620,9 @@
             if (settings.code === true) {
                 $toolbarList.append($toolbarElement.clone().append($btnCode));
             }
-            if (settings.save === true) {
-                $toolbarList.append($toolbarElement.clone().append($btnSave));
-            }
 
             // set current textarea value to editor
             $editorView.html($inputElement.val());
-            $editorView.data('content-val', $inputElement.val());
 
             $editor.append($toolbar);
             $editor.append($editorView);
@@ -741,42 +630,35 @@
             $inputElement.replaceWith($editor);
 
             // append bottom toolbar
-            $bottomToolbar = $('<div />', {class: 'richText-toolbar'});
-            if (!settings.preview && settings.undoRedo) {
-                $bottomToolbar.append($('<a />', {
-                    class: 'richText-undo is-disabled',
-                    html: '<span class="fa fa-undo"></span>',
-                    'title': settings.translations.undo
-                }));
-                $bottomToolbar.append($('<a />', {
-                    class: 'richText-redo is-disabled',
-                    html: '<span class="fa fa-repeat fa-redo"></span>',
-                    'title': settings.translations.redo
-                }));
-            }
+            $editor.append(
+                $('<div />', {class: 'richText-toolbar'})
+                    .append($('<a />', {
+                        class: 'richText-undo is-disabled',
+                        html: '<span class="fa fa-undo"></span>',
+                        'title': settings.translations.undo
+                    }))
+                    .append($('<a />', {
+                        class: 'richText-redo is-disabled',
+                        html: '<span class="fa fa-repeat fa-redo"></span>',
+                        'title': settings.translations.redo
+                    }))
+                    .append($('<a />', {class: 'richText-help', html: '<span class="fa fa-question-circle"></span>'}))
+            );
 
-            $bottomToolbar.append($('<a />', {class: 'richText-help', html: '<span class="fa fa-question-circle"></span>'}));
-            $editor.append($bottomToolbar);
-
-			var maxlength = settings.maxlength;
-			if (!maxlength && $inputElement.attr("maxlength")) {
-				maxlength = $inputElement.attr("maxlength");
-			}
-            if (maxlength > 0) {
+            if (settings.maxlength > 0) {
                 // display max length in editor toolbar
-                $editor.data('maxlength', maxlength);
+                $editor.data('maxlength', settings.maxlength);
                 $editor.children('.richText-toolbar').children('.richText-help').before($('<a />', {
                     class: 'richText-length',
-                    text: '0/' + maxlength
+                    text: '0/' + settings.maxlength
                 }));
-                updateMaxLength($editor.find('.richText-editor').attr('id'));
             }
 
             if (settings.height && settings.height > 0) {
                 // set custom editor height
                 $editor.children(".richText-editor, .richText-initial").css({
                     'min-height': settings.height + 'px',
-                    'height': settings.adaptiveHeight ? 'auto' : settings.height + 'px'
+                    'height': settings.height + 'px'
                 });
             } else if (settings.heightPercentage && settings.heightPercentage > 0) {
                 // set custom editor height in percentage
@@ -789,11 +671,7 @@
                 height -= parseInt($editor.find(".richText-editor").css("padding-bottom")); // remove paddings
                 $editor.children(".richText-editor, .richText-initial").css({
                     'min-height': height + 'px',
-                    'height': settings.adaptiveHeight ? 'auto' : height + 'px'
-                });
-            } else if (settings.adaptiveHeight) {
-                $editor.children(".richText-editor, .richText-initial").css({
-                    'height': 'auto'
+                    'height': height + 'px'
                 });
             }
 
@@ -854,6 +732,7 @@
             }
         });
 
+
         // Saving changes from editor to textarea
         settings.$editor.find('.richText-editor').on('input change blur keydown keyup', function (e) {
             if ((e.keyCode === 9 || e.keyCode === "9") && e.type === "keydown") {
@@ -867,7 +746,7 @@
                 return false;
             }
             fixFirstLine();
-            updateTextarea(e);
+            updateTextarea();
             doSave($(this).attr("id"));
             updateMaxLength($(this).attr('id'));
         });
@@ -892,6 +771,7 @@
                 'top': positionY,
                 'left': positionX
             });
+
 
             if ($target.prop("tagName") === "A") {
                 // edit URL
@@ -1353,12 +1233,7 @@
                 event.preventDefault();
                 var command = $(this).data("command");
 
-                if (command === 'toggleSave') {
-                    $editor.trigger('change');
-                    if (typeof settings.saveCallback === 'function') {
-                        settings.saveCallback($editor, 'save', getEditorContent(editorID));
-                    }
-                } else if (command === "toggleCode") {
+                if (command === "toggleCode") {
                     toggleCode($editor.attr("id"));
                 } else {
                     var option = null;
@@ -1447,12 +1322,12 @@
             // Execute the command
             if (command === "heading" && getSelectedText()) {
                 // IE workaround
-                wrapTextNode(option, '<' + option + '>' + getSelectedText() + '</' + option + '>');
+                pasteHTMLAtCaret('<' + option + '>' + getSelectedText() + '</' + option + '>');
             } else if (command === "fontSize" && parseInt(option) > 0) {
                 var selection = getSelectedText();
                 selection = (selection + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + '<br>' + '$2');
                 var html = (settings.useSingleQuotes ? "<span style='font-size:" + option + "px;'>" + selection + "</span>" : '<span style="font-size:' + option + 'px;">' + selection + '</span>');
-                wrapTextNode('span style="font-size:' + option + 'px;"', html);
+                pasteHTMLAtCaret(html);
             } else {
                 document.execCommand(command, false, option);
             }
@@ -1460,50 +1335,20 @@
             // document.designMode = "OFF";
         }
 
+
         /**
-         * Get content of editor pseudo-element per id
-         *
-         * @param      string  editorId  The editor identifier
-         * @return     string  Content of Editor element
+         * Update textarea when updating editor
+         * @private
          */
-        function getEditorContent(editorId) {
+        function updateTextarea() {
             var $editor = $('#' + editorID);
             var content = $editor.html();
             if (settings.useSingleQuotes === true) {
                 content = changeAttributeQuotes(content);
             }
-            return content;
+            $editor.siblings('.richText-initial').val(content);
         }
-        /**
-         * Update textarea when updating editor
-         * @private
-         */
-        function updateTextarea(event) {
-            var $editor = $('#' + editorID);
-            content = getEditorContent(editorID);
-            if (content !== $editor.siblings('.richText-initial').val()) {
-                $editor.siblings('.richText-initial').val(content);
-            }
-            // On blur editor - checking content and if it is changed, update content on control of form
-            if (settings.saveOnBlur && event && event.type === 'blur') {
-                settings.blurTriggered = true;
-                // trigger updating content after saveOnBlur ns to save last action of editor
-                setTimeout(() => {
-                    // if blur event not triggered = noting to do  .....
-                    if (!settings.blurTriggered) {
-                        return;
-                    }
-                    var content = getEditorContent(editorID);
-                    if ($editor.data('content-val') !== content) {
-                        $editor.data('content-val', content);
-                        $editor.trigger('change');
-                        if (typeof settings.saveCallback === 'function') {
-                            settings.saveCallback($editor, 'blur', content);
-                        }
-                    }
-                }, settings.saveOnBlur);
-            }
-        }
+
 
         /**
          * Update editor when updating textarea
@@ -1570,8 +1415,6 @@
                     'editorID': editorID,
                     'anchor': $('#' + editorID).children('div')[0]
                 };
-            } else if (!savedSel.editorID && editorID) {
-                savedSel.editorID = editorID;
             }
 
             if (savedSel.editorID !== editorID) {
@@ -1798,9 +1641,6 @@
             var range;
             if (window.getSelection) {  // all browsers, except IE before version 9
                 range = window.getSelection();
-                if (range.isCollapsed) {
-                    return false;
-                }
                 return range.toString() ? range.toString() : range.focusNode.nodeValue;
             } else if (document.selection.createRange) { // Internet Explorer
                 range = document.selection.createRange();
@@ -1830,7 +1670,7 @@
             }
             var color;
             var maxLength = parseInt($editor.data('maxlength'));
-            var content = settings.maxlengthIncludeHTML ? $editorInner.html() : $editorInner.text();
+            var content = $editorInner.text();
             var percentage = (content.length / maxLength) * 100;
             if (percentage > 99) {
                 color = 'red';
@@ -1926,20 +1766,6 @@
             }
         }
 
-        function wrapTextNode(tag, html) {
-            if (window.getSelection) {
-                // IE9 and non-IE
-                sel = window.getSelection();
-                console.log(sel, 1);
-                if (sel.focusNode.nodeType === 3) {
-                    $(sel.focusNode).wrap('<' + tag + ' />');
-                }
-
-                return;
-            }
-            pasteHTMLAtCaret(html);
-        }
-
         /**
          * Paste HTML at caret position
          * @param {string} html HTML code
@@ -2022,7 +1848,7 @@
          * @private
          */
         function loadColors(command) {
-            var colors = {};
+            var colors = [];
             var result = '';
 
             colors["#FFFFFF"] = settings.translations.white;
@@ -2043,7 +1869,7 @@
             colors["#F79646"] = settings.translations.orange;
             colors["#FFFF00"] = settings.translations.yellow;
 
-            if (settings.colors && Object.keys(settings.colors).length) {
+            if (settings.colors && settings.colors.length > 0) {
                 colors = settings.colors;
             }
 
@@ -2298,6 +2124,65 @@
         }
 
         return $(this);
+    };
+
+    $.fn.unRichText = function (options) {
+
+        // set default options
+        // and merge them with the parameter options
+        var settings = $.extend({
+            delay: 0 // delay in ms
+        }, options);
+
+        var $editor, $textarea, $main;
+        var $el = $(this);
+
+        /**
+         * Initialize undoing RichText and call remove() method
+         */
+        function init() {
+
+            if ($el.hasClass('richText')) {
+                $main = $el;
+            } else if ($el.hasClass('richText-initial') || $el.hasClass('richText-editor')) {
+                $main = $el.parents('.richText');
+            }
+
+            if (!$main) {
+                // node element does not correspond to RichText elements
+                return false;
+            }
+
+            $editor = $main.find('.richText-editor');
+            $textarea = $main.find('.richText-initial');
+
+            if (parseInt(settings.delay) > 0) {
+                // a delay has been set
+                setTimeout(remove, parseInt(settings.delay));
+            } else {
+                remove();
+            }
+        }
+
+        init();
+
+        /**
+         * Remove RichText elements
+         */
+        function remove() {
+            $main.find('.richText-toolbar').remove();
+            $main.find('.richText-editor').remove();
+            $textarea
+                .unwrap('.richText')
+                .data('editor', 'richText')
+                .removeClass('richText-initial')
+                .show();
+
+            if (settings.callback && typeof settings.callback === 'function') {
+                settings.callback();
+            }
+        }
+
     };
 
 }(jQuery));

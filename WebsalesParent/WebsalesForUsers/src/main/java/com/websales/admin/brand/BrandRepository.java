@@ -10,10 +10,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import com.websales.admin.paging.SearchRepository;
 import com.websales.common.entity.Brand;
 
 @Repository
-public interface BrandRepository extends CrudRepository<Brand, Integer>, PagingAndSortingRepository<Brand, Integer>{
+public interface BrandRepository extends CrudRepository<Brand, Integer>, SearchRepository<Brand, Integer>{
 	
 	@Query("SELECT bra FROM Brand bra WHERE bra.name LIKE %?1%")
 	public Page<Brand> findAll(String keyword, Pageable pageable);

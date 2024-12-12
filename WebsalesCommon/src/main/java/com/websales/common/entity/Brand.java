@@ -15,17 +15,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name="brands")
-public class Brand {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	
-	@Column(length = 45, nullable = false, unique = true )
+@Table(name = "brands")
+
+public class Brand extends IdBasedEntity{
+
+	@Column(nullable = false, length = 45, unique = true)
 	private String name;
-	
-	@Column(length = 45, nullable = false)
+
+	@Column(nullable = false, length = 128)
 	private String logo;
 	
 	@ManyToMany
@@ -36,29 +33,23 @@ public class Brand {
 			)
 	private Set<Category> categories = new HashSet<>();
 	
-	public Brand() { }
-	
-	
+	public Brand(String name) {
+		this.name = name;
+		this.logo = "brand-logo.png";
+	}
 	
 	public Brand(Integer id, String name) {
 		this.id = id;
 		this.name = name;
 	}
-
-
-
-	public Brand(String name, String logo) { 
-		this.name = name;
-		this.logo = logo;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
+	
+	public Brand(Integer id) {
 		this.id = id;
 	}
+	
+	public Brand() {}
+	
+	
 
 	public String getName() {
 		return name;
@@ -84,20 +75,15 @@ public class Brand {
 		this.categories = categories;
 	}
 
-	@Transient
-	public String getLogoPath() {
-		
-		if(this.id == null) return "fake.png";
-		
-		return "/brand-logos/" + this.id + "/" + this.logo;
-		
-	}
-	
 	@Override
 	public String toString() {
-		return this.name;
+		return "Brand [id=" + id + ", name=" + name + ", categories=" + categories + "]";
 	}
+	
+	@Transient
+	public String getLogoPath() {
+		if (this.id == null) return "/images/image-thumbnail.png";
 
-	
-	
+		return "/brand-logos/" + this.id + "/" + this.logo;		
+	}
 }

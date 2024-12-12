@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
@@ -18,10 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.service.annotation.PatchExchange;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.websales.admin.FileUploadUtil;
 import com.websales.admin.export.UserCsvExporter;
 import com.websales.admin.export.UserExcelExporter;
 import com.websales.admin.export.UserPdfExporter;
+import com.websales.admin.paging.PagingAndSortingHelper;
+import com.websales.admin.paging.PagingAndSortingParam;
+import com.websales.admin.util.DirectUtil;
+import com.websales.admin.util.FileUploadUtil;
 import com.websales.common.entity.Role;
 import com.websales.common.entity.User;
 
@@ -30,150 +35,241 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 public class UserController {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
 	@Autowired
-	private UserService userService;
+	private UserService service;
+	
+	private String defaultRedirectURL = "redirect:/users/page/1?sortField=firstName&sortDir=asc";
 	
 	@GetMapping("/users")
-	public String listFirstPage(Model model) { 
-		return listByPage(1, model,"firstName", "asc", null);
+	public String listFirstPage() {
+		
+		LOGGER.info("UserController | listFirstPage is started");
+		
+		return defaultRedirectURL;
 	}
 	
-	
-	@GetMapping("/users/page/{pageNum}"	)
-	public String listByPage(@PathVariable(name="pageNum") int pageNum, Model model
-			, @Param("sortField") String sortField, @Param("sortDir") String sortDir, @Param("keyword") String keyword) {
-		Page<User> page = userService.listByPage(pageNum, sortField, sortDir, keyword);
-		List<User> listUsers = page.getContent();
-	
-		long startCount = (pageNum - 1) * UserService.USERS_PER_PAGE + 1;
-		long endCount = startCount + UserService.USERS_PER_PAGE - 1;
-		if(endCount > page.getTotalElements()) { 
-			endCount = page.getTotalElements();
-		}
+	@GetMapping("/users/page/{pageNum}")
+	public String listByPage(@PagingAndSortingParam(listName = "listUsers", moduleURL = "/users") PagingAndSortingHelper helper,
+			@PathVariable int pageNum) {
 		
-		String reverseSortDir = sortDir.equals("asc") ? "desc" : "asc"; 
+		LOGGER.info("UserController | listByPage is started");
 		
-		model.addAttribute("currentPage", pageNum);
-		model.addAttribute("totalPages", page.getTotalPages());
-		model.addAttribute("startCount", startCount);
-		model.addAttribute("endCount", endCount);
-		model.addAttribute("totalItems", page.getTotalElements());
-		model.addAttribute("sortField", sortField);
-		model.addAttribute("sortDir", sortDir);
-		model.addAttribute("reverseSortDir", reverseSortDir);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("listUsers", listUsers);
-		
-		return "/users/users";
-	} 
+		service.listByPage(pageNum, helper);
+
+		return "users/users";	
+	}
 	
 	@GetMapping("/users/new")
 	public String newUser(Model model) {
 		
-		List<Role> listRoles = userService.listRoles();
+		LOGGER.info("UserController | newUser is called");
+		
+		List<Role> listRoles = service.listRoles();
+		
+		LOGGER.info("UserController | newUser | listRoles.size() : " + listRoles.size());
+		
 		User user = new User();
 		user.setEnabled(true);
+		
+		LOGGER.info("UserController | newUser | user : " + user.toString());
+		
 		model.addAttribute("user", user);
 		model.addAttribute("listRoles", listRoles);
 		model.addAttribute("pageTitle", "Create New User");
-		return "/users/user_form";
+		
+		return "users/user_form";
 	}
 	
+	@PostMapping("/users/save")
+	public String saveUser(User user, RedirectAttributes redirectAttributes, 
+			@RequestParam("image") MultipartFile multipartFile) throws IOException {
+		
+		LOGGER.info("UserController | saveUser is called");
+		
+		LOGGER.info("UserController | saveUser | multipartFile : " + multipartFile);
+
+		if (!multipartFile.isEmpty()) {
+				String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+				
+				LOGGER.info("UserController | saveUser | fileName : " + fileName);
+				
+				user.setPhotos(fileName);
+				User savedUser = service.save(user);
+				
+				LOGGER.info("UserController | saveUser | savedUser : " + savedUser.toString());
+	
+				String uploadDir = "user-photos/" + savedUser.getId();
+				
+				LOGGER.info("UserController | saveUser | uploadDir : " + uploadDir);
+	
+				// Image Folder
+				FileUploadUtil.cleanDir(uploadDir);
+				FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+			
+	
+		} else {
+			
+			LOGGER.info("UserController | saveUser | user.getPhotos() : " + user.getPhotos());
+			
+			if (user.getPhotos().isEmpty()) user.setPhotos(null);
+			service.save(user);
+			
+			LOGGER.info("UserController | saveUser | save completed");
+		}
+		
+		
+		redirectAttributes.addFlashAttribute("messageSuccess", "The user has been saved successfully.");
+		
+		return DirectUtil.getRedirectURL(user);
+	}
 	
 	@GetMapping("/users/edit/{id}")
-	public String editUser(@PathVariable(name="id") Integer id, Model model, RedirectAttributes redirectAttributes) { 
+	public String editUser(@PathVariable Integer id, 
+			Model model,
+			RedirectAttributes redirectAttributes) {
 		
-		try { 
-			User user = userService.get(id);
-			List<Role> listRoles = userService.listRoles();
+		LOGGER.info("UserController | editUser is called");
+		
+		try {
+			User user = service.get(id);
+			
+			LOGGER.info("UserController | editUser | user : " + user.toString());
+			
+			List<Role> listRoles = service.listRoles();
+			
+			LOGGER.info("UserController | editUser | listRoles.size() : " + listRoles.size());
 			
 			model.addAttribute("user", user);
+			model.addAttribute("pageTitle", "Edit User (ID: " + id + ")");
 			model.addAttribute("listRoles", listRoles);
-			model.addAttribute("pageTitle", "Edit User ID: " + id);
-			return "/users/user_form";
-		}catch (UserNotFoundException ex) {
-			redirectAttributes.addFlashAttribute("message", ex);
-			return "redirect:/users";
+			
+			return "users/user_form";
+			
+		} catch (UserNotFoundException ex) {
+			
+			LOGGER.error("UserController | editUser | ex.getMessage() : " + ex.getMessage());
+			
+			redirectAttributes.addFlashAttribute("messageError", ex.getMessage());
+			return defaultRedirectURL;
 		}
 	}
 	
 	@GetMapping("/users/delete/{id}")
-	public String deleteUser(@PathVariable(name="id") Integer id, Model model, RedirectAttributes redirectAttributes) { 
-		
-		try { 
-			userService.delete(id) ;
-			redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been deleted successfully");
-			
-		}catch (UserNotFoundException ex) {
-			redirectAttributes.addFlashAttribute("message", ex);
-		}
-		
-		return "redirect:/users";
-	}
-	
-	
-	@GetMapping("/users/{id}/enabled/{status}")
-	public String changeUserEnabledStatus(@PathVariable(name="id") Integer id, @PathVariable(name="status") boolean enabled, 
+	public String deleteUser(@PathVariable Integer id, 
+			Model model,
 			RedirectAttributes redirectAttributes) {
 		
-		userService.updateUserEnabledStatus(id, enabled);
-		String status = enabled ? "enabled" : "disabled";
+		LOGGER.info("UserController | deleteUser is called");
 		
-		redirectAttributes.addFlashAttribute("message", "The user ID " + id + " has been " + status);
-		return "redirect:/users";
-	} 
-	
-
-	
-	@PostMapping("/users/save")
-	public String saveUser(User user, RedirectAttributes redirectAttributes,
-			@RequestParam("image") MultipartFile multipartFile) throws IOException { 
+		try {
+			service.delete(id);
+			
+			String userPhotosDir = "user-photos/" + id;
+			
+			LOGGER.info("CategoryController | deleteUser | userPhotosDir : " + userPhotosDir);
+			
+			// Image Folder
+			FileUploadUtil.removeDir(userPhotosDir);
+			
 		
-		if(!multipartFile.isEmpty())  { 
-			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-			user.setPhotos(fileName);
-			User savedUser = userService.save(user);
 			
-			String uploadDir = "user-photos/" + savedUser.getId();
+			LOGGER.info("UserController | deleteUser | delete completed");
 			
-			FileUploadUtil.cleanDir(uploadDir);
-			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-
-		} else { 
-			if(user.getPhotos().isEmpty()) {
-				user.setPhotos(null);
-			}
-			userService.save(user);
+			redirectAttributes.addFlashAttribute("messageSuccess", 
+					"The user ID " + id + " has been deleted successfully");
+		} catch (UserNotFoundException ex) {
+			
+			LOGGER.error("UserController | deleteUser | ex.getMessage() : " + ex.getMessage());
+			
+			redirectAttributes.addFlashAttribute("messageError", ex.getMessage());
 		}
-						
-		redirectAttributes.addFlashAttribute("message", "The user has been saved successfully!");
 		
-		String firstPartEmail = user.getEmail().split("@")[0];
-		
-		return "redirect:/users/page/1?sortField=id&sortDir=asc&keyword=" + firstPartEmail ;
+		return defaultRedirectURL;
 	}
 	
+	@GetMapping("/users/{id}/enabled/{status}")
+	public String updateUserEnabledStatus(@PathVariable Integer id,
+			@PathVariable("status") boolean enabled, RedirectAttributes redirectAttributes) {
+		
+		LOGGER.info("UserController | updateUserEnabledStatus is called");
+		
+		service.updateUserEnabledStatus(id, enabled);
+		
+		LOGGER.info("UserController | updateUserEnabledStatus completed");
+		
+		String status = enabled ? "enabled" : "disabled";
+		
+		LOGGER.info("UserController | updateUserEnabledStatus | status : " + status);
+		
+		String message = "The user ID " + id + " has been " + status;
+		
+		LOGGER.info("UserController | updateUserEnabledStatus | message : " + message);
+		
+		if(message.contains("enabled")) {
+			redirectAttributes.addFlashAttribute("messageSuccess", message);
+		}else {
+			redirectAttributes.addFlashAttribute("messageError", message);
+		}
+		
+		
+		return defaultRedirectURL;
+	}
 	
 	@GetMapping("/users/export/csv")
-	public void exportToCSV(HttpServletResponse re) throws IOException { 
-		List<User> listUsers = userService.listAll();
+	public void exportToCSV(HttpServletResponse response) throws IOException {
+		
+		LOGGER.info("UserController | exportToCSV is called");
+		
+		List<User> listUsers = service.listAll();
+		
+		LOGGER.info("UserController | exportToCSV | listUsers.size() : " + listUsers.size());
+		
 		UserCsvExporter exporter = new UserCsvExporter();
-		exporter.export(listUsers, re);
-	} 
-	
+		
+		
+		LOGGER.info("UserController | exportToCSV | export is starting");
+		
+		exporter.export(listUsers, response);
+		
+		LOGGER.info("UserController | exportToCSV | export completed");
+	}
 	
 	@GetMapping("/users/export/excel")
-	public void exportToExcel(HttpServletResponse re) throws IOException { 
-		List<User> listUsers = userService.listAll();
-		UserExcelExporter exporter = new UserExcelExporter();
-		exporter.export(listUsers, re);
+	public void exportToExcel(HttpServletResponse response) throws IOException {
 		
+		LOGGER.info("UserController | exportToExcel is called");
+		
+		List<User> listUsers = service.listAll();
+		
+		LOGGER.info("UserController | exportToExcel | listUsers.size() : " + listUsers.size());
+
+		UserExcelExporter exporter = new UserExcelExporter();
+		
+		LOGGER.info("UserController | exportToExcel | export is starting");
+		
+		exporter.export(listUsers, response);
+		
+		LOGGER.info("UserController | exportToExcel | export completed");
 	}
 	
 	@GetMapping("/users/export/pdf")
-	public void exportToPdf(HttpServletResponse re) throws IOException { 
-		List<User> listUsers = userService.listAll();
+	public void exportToPDF(HttpServletResponse response) throws IOException {
+		
+		LOGGER.info("UserController | exportToPDF is called");
+		
+		List<User> listUsers = service.listAll();
+		
+		LOGGER.info("UserController | exportToPDF | listUsers.size() : " + listUsers.size());
+		
 		UserPdfExporter exporter = new UserPdfExporter();
-		exporter.export(listUsers, re);
-	}
- }
+		
+		LOGGER.info("UserController | exportToPDF | export is starting");
+		
+		exporter.export(listUsers, response);
+		
+		LOGGER.info("UserController | exportToPDF | export completed");
+	}	
+}
+

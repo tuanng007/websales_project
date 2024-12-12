@@ -21,224 +21,225 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-public class CategoryService {
+public class CategoryService implements ICategoryService{
 	
-	public static final int CATEGORIES_PER_PAGE = 4;
+	public static final int ROOT_CATEGORIES_PER_PAGE = 4;
 	
 	@Autowired
-	private CategoryRepository categoryRepo;
+	private CategoryRepository categoryRepository;
 	
-	public List<Category> listByPage(CategoryPageInfo pageInfo,int pageNum, String sortDir, String keyword) {
+	public List<Category> listAll() {
+		return listByPage(new CategoryPageInfo(), 1, "asc", null);
+	}
+
+	@Override
+	public List<Category> listByPage(CategoryPageInfo pageInfo, int pageNum, String sortDir,
+			String keyword) {
+		// TODO Auto-generated method stub
 		Sort sort = Sort.by("name");
-		
-		if(sortDir.equals("asc")) { 
+
+		if (sortDir.equals("asc")) {
 			sort = sort.ascending();
-		} else if(sortDir.equals("desc")) {
+		} else if (sortDir.equals("desc")) {
 			sort = sort.descending();
 		}
+
+		Pageable pageable = PageRequest.of(pageNum - 1, ROOT_CATEGORIES_PER_PAGE, sort);
+
 		
-		Pageable pageable = PageRequest.of(pageNum - 1, CATEGORIES_PER_PAGE, sort);
-		
-		Page<Category> pageCategory = null;
-		
-		if(keyword != null)  {
-			pageCategory = categoryRepo.search(keyword, pageable);
-			
-		} else { 
-			pageCategory = categoryRepo.findRootCategories(pageable);
+		Page<Category> pageCategories = null;
+
+		if (keyword != null && !keyword.isEmpty()) {
+			pageCategories = categoryRepository.search(keyword, pageable);	
+		} else {
+			pageCategories = categoryRepository.findRootCategories(pageable);
 		}
 		
-		List<Category> listRootCategories = pageCategory.getContent();
-		
-		pageInfo.setTotalPages(pageCategory.getTotalPages());
-		pageInfo.setTotalElements(pageCategory.getTotalElements());
-		
-		if(keyword != null) { 
-			List<Category> searchCategory = pageCategory.getContent();
-			for(Category category : searchCategory) { 
+		List<Category> rootCategories = pageCategories.getContent();
+
+		pageInfo.setTotalElements(pageCategories.getTotalElements());
+		pageInfo.setTotalPages(pageCategories.getTotalPages());
+
+		if (keyword != null && !keyword.isEmpty()) {
+			List<Category> searchResult = pageCategories.getContent();
+			for (Category category : searchResult) {
 				category.setHasChildren(category.getChildren().size() > 0);
 			}
-			
-			return searchCategory;
+
+			return searchResult;
+
 		} else {
-			return listHierarchicalCategories(listRootCategories, sortDir);
+			return listHierarchicalCategories(rootCategories, sortDir);
 		}
 	}
 	
-	public List<Category> listAll(String sortDir){
-		Sort sort = Sort.by("name");
-		
-		if(sortDir.equals("asc")) { 
-			sort = sort.ascending();
-		} else if(sortDir.equals("desc")) { 
-			sort = sort.descending();
-		}
-		
-		List<Category> listRootCategories = categoryRepo.findRootCategories(sort);
-		
-		return listHierarchicalCategories(listRootCategories, sortDir);
-	}
-	
-	private List<Category> listHierarchicalCategories(List<Category> listRootCategories, String sortDir) {
+	private List<Category> listHierarchicalCategories(List<Category> rootCategories, String sortDir) {
 		List<Category> hierarchicalCategories = new ArrayList<>();
-		
-		for(Category rootCategory : listRootCategories) {
-			hierarchicalCategories.add(Category.copyAll(rootCategory));
-			
-			Set<Category> children = sortedSubCategories(rootCategory.getChildren(), sortDir);
-			
-			for(Category subCategory : children) { 
+
+		for (Category rootCategory : rootCategories) {
+			hierarchicalCategories.add(Category.copyFull(rootCategory));
+
+			Set<Category> children = sortSubCategories(rootCategory.getChildren(), sortDir);
+
+			for (Category subCategory : children) {
 				String name = "--" + subCategory.getName();
-				hierarchicalCategories.add(Category.copyAll(subCategory, name));
-				
+				hierarchicalCategories.add(Category.copyFull(subCategory, name));
+
 				listSubHierarchicalCategories(hierarchicalCategories, subCategory, 1, sortDir);
 			}
 		}
-		
+
 		return hierarchicalCategories;
 	}
 
-	
-	private void listSubHierarchicalCategories(List<Category> hierarchicalCategories, 
+	private void listSubHierarchicalCategories(List<Category> hierarchicalCategories,
 			Category parent, int subLevel, String sortDir) {
+		Set<Category> children = sortSubCategories(parent.getChildren(), sortDir);
 		int newSubLevel = subLevel + 1;
-		Set<Category> children = sortedSubCategories(parent.getChildren(), sortDir);
-		
-		for(Category subCategory : children) {
-			String name = "";
-			for(int i = 0; i < newSubLevel; i++) {
-				name += "--";
-			} 
-			name += subCategory.getName();
-			
-			hierarchicalCategories.add(Category.copyAll(subCategory, name));
-			
-			listSubHierarchicalCategories(hierarchicalCategories, subCategory, newSubLevel, sortDir);
-		
-		}
-	}
-	
-	public List<Category> listCategoriesInForm() { 
-		List<Category> categoriesInForm = new ArrayList<>();
-		
-		Iterable<Category> categoriesInDB = categoryRepo.findRootCategories(Sort.by("name").ascending());
-		
-		for(Category category : categoriesInDB) {
-			if(category.getParent() == null) { 
-				categoriesInForm.add(Category.copyIDandName(category));
 
-			
-			Set<Category> children = sortedSubCategories(category.getChildren());
-						
-			for(Category subCategory : children) { 
-				String name = "--" + subCategory.getName();
-				categoriesInForm.add(Category.copyIDandName(subCategory.getId(), name));
-				
-				listSubCategoriesUsedInForm(categoriesInForm, subCategory, 1);
-				}
-			}
-		}
-		
-		return categoriesInForm;
-		
-	}
-	
-	
-	private void listSubCategoriesUsedInForm(List<Category> categoriesInForm , Category parent, int sublevel) { 
-		int newSubLevel = sublevel + 1;
-		Set<Category> children = sortedSubCategories(parent.getChildren());
-		
-		for(Category subCategory : children) {
+		for (Category subCategory : children) {
 			String name = "";
-			for(int i = 0; i < newSubLevel; i++) {
+			for (int i = 0; i < newSubLevel; i++) {				
 				name += "--";
-			} 
+			}
 			name += subCategory.getName();
+
+			hierarchicalCategories.add(Category.copyFull(subCategory, name));
+
+			listSubHierarchicalCategories(hierarchicalCategories, subCategory, newSubLevel, sortDir);
+		}
+
+	}
+
+	@Override
+	public List<Category> listCategoriesUsedInForm() {
+		
+		List<Category> categoriesUsedInForm = new ArrayList<>();
+
+		Iterable<Category> categoriesInDB = categoryRepository.findAll();
+
+		for (Category category : categoriesInDB) {
+			categoriesUsedInForm.add(Category.copyIdAndName(category));
+
+			Set<Category> children = sortSubCategories(category.getChildren());
+
+			for (Category subCategory : children) {
+				String name = "--" + subCategory.getName();
+				categoriesUsedInForm.add(Category.copyIdAndName(subCategory.getId(), name));
+				listSubCategoriesUsedInForm(categoriesUsedInForm, subCategory, 1);
+			}
 			
-			categoriesInForm.add(Category.copyIDandName(subCategory.getId(), name));
-			
-			listSubCategoriesUsedInForm(categoriesInForm, subCategory, newSubLevel);
-		} 
+		}		
+
+		return categoriesUsedInForm;
 	}
 	
-	public Category get(Integer id) throws CategoryNotFoundException { 
-		try { 
-			return categoryRepo.findById(id).get();
-		}catch (NoSuchElementException e) {
-			throw new CategoryNotFoundException("Could not find any categories id: " + id);
+	private void listSubCategoriesUsedInForm(List<Category> categoriesUsedInForm, 
+			Category parent, int subLevel){
+		int newSubLevel = subLevel + 1;
+		Set<Category> children = sortSubCategories(parent.getChildren());
+
+		for (Category subCategory : children) {
+			String name = "";
+			for (int i = 0; i < newSubLevel; i++) {				
+				name += "--";
+			}
+			name += subCategory.getName();
+
+			categoriesUsedInForm.add(Category.copyIdAndName(subCategory.getId(), name));
+
+			listSubCategoriesUsedInForm(categoriesUsedInForm, subCategory, newSubLevel);
+		}		
+	}
+
+	@Override
+	public Category save(Category category) {
+		// TODO Auto-generated method stub
+		
+		Category parent = category.getParent();
+		if (parent != null) {
+			String allParentIds = parent.getAllParentIDs() == null ? "-" : parent.getAllParentIDs();
+			allParentIds += String.valueOf(parent.getId()) + "-";
+			category.setAllParentIDs(allParentIds);
+		}
+		
+		return categoryRepository.save(category);
+	}
+	
+	@Override
+	public Category get(Integer id) throws CategoryNotFoundException {
+		try {
+			return categoryRepository.findById(id).get();
+		} catch (NoSuchElementException ex) {
+			throw new CategoryNotFoundException("Could not find any category with ID " + id);
 		}
 	}
 	
-	public String checkUniqueCategory(Integer id, String name, String alias)  { 
+	@Override
+	public String checkUnique(Integer id, String name, String alias) {
 		boolean isCreatingNew = (id == null || id == 0);
-		
-		Category categoryByName = categoryRepo.findByName(name);
-		
-		if(isCreatingNew) { 
-			if(categoryByName != null) { 
+
+		Category categoryByName = categoryRepository.findByName(name);
+
+		if (isCreatingNew) {
+			if (categoryByName != null) {
 				return "DuplicateName";
-			} else { 
-				Category categoryByAlias = categoryRepo.findByAlias(alias);
-				if(categoryByAlias != null) { 
-					return "DuplicateAlias";
+			} else {
+				Category categoryByAlias = categoryRepository.findByAlias(alias);
+				if (categoryByAlias != null) {
+					return "DuplicateAlias";	
 				}
 			}
-		} else { 
-			if(categoryByName != null && categoryByName.getId() != id) { 
+		} else {
+			if (categoryByName != null && categoryByName.getId() != id) {
 				return "DuplicateName";
 			}
-			
-			Category categoryByAlias = categoryRepo.findByAlias(alias);
-			if(categoryByAlias != null && categoryByAlias.getId() != id)  { 
+
+			Category categoryByAlias = categoryRepository.findByAlias(alias);
+			if (categoryByAlias != null && categoryByAlias.getId() != id) {
 				return "DuplicateAlias";
 			}
+
 		}
-		
+
 		return "OK";
 	}
 	
-	private SortedSet<Category> sortedSubCategories(Set<Category> children) { 
-		return sortedSubCategories(children,"asc");
+	private SortedSet<Category> sortSubCategories(Set<Category> children) {
+		return sortSubCategories(children, "asc");
 	}
-	
-	private SortedSet<Category> sortedSubCategories(Set<Category> children, String sortDir) {
-		SortedSet<Category> sortedChildren = new TreeSet<>(new Comparator<Category>() {
 
+	private SortedSet<Category> sortSubCategories(Set<Category> children, String sortDir) {
+		SortedSet<Category> sortedChildren = new TreeSet<>(new Comparator<Category>() {
 			@Override
-			public int compare(Category o1, Category o2) {
-				if("asc".equals(sortDir)) {
-					return o1.getName().compareTo(o2.getName());
-			} else  { 
-				return o2.getName().compareTo(o1.getName());
+			public int compare(Category cat1, Category cat2) {
+				if (sortDir.equals("asc")) {
+					return cat1.getName().compareTo(cat2.getName());
+				} else {
+					return cat2.getName().compareTo(cat1.getName());
 				}
 			}
-		}	
-		);
-		
+		});
+
 		sortedChildren.addAll(children);
+
+		return sortedChildren;
+	}
+
+	@Override
+	public void updateCategoryEnabledStatus(Integer id, boolean enabled) {
+		categoryRepository.updateEnabledStatus(id, enabled);
+	}
+	
+	@Override
+	public void delete(Integer id) throws CategoryNotFoundException {
 		
-		return sortedChildren; 
+		Long countById = categoryRepository.countById(id);
 		
-	}
-	
-	public void updateCategoryEnabledStatus(Integer id, boolean status) { 
-		categoryRepo.updateEnabledStatus(id, status);
-	}
-	
-	public void delete(Integer id) throws CategoryNotFoundException { 
-		Long categoryById = categoryRepo.countById(id);
-		if(categoryById == null || categoryById == 0) { 
-			throw new CategoryNotFoundException("Could not find any category ID: " + categoryById);
+		if (countById == null || countById == 0) {
+			throw new CategoryNotFoundException("Could not find any category with ID " + id);
 		}
-		else  {
-		categoryRepo.deleteById(id);
-		}
+
+		categoryRepository.deleteById(id);
 	}
-	
-	
-	public Category save(Category category) {
-		return categoryRepo.save(category);
-	}
-	
-	
 }

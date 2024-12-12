@@ -1,24 +1,31 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments :: page_head('Home - Websales','none')}">
-	
-</head>
-<body>
-	<div th:replace="~{navigation :: menu}"></div>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+      
+<head th:replace="fragments :: page_head('Home - Shopme Admin', 'none')" />
 
-	<div>
-		<h1>Websales Control Panel</h1>
+<body>
+
+	<div class="container-fluid">
+
+		<div th:replace="navigation :: menu"></div>
+
+
+		<div>
+			<h2>[[#{app.title}]]</h2>
+			[[#{app.welcome.title}]] 
+			<a th:href="@{/account}" 
+				sec:authentication="principal.fullname"></a>	
+			<span sec:authentication="principal.authorities"></span>		
+		</div>
+		
+		
+		<div th:replace="fragments :: footer"></div>
+
+
 	</div>
-	Welcome 
-	<a th:href="@{/account}" 
-		sec:authentication="principal.fullname"></a>
-	&nbsp;
-	<span sec:authentication="principal.authorities"></span>	
-	
-	
-	<div th:replace="~{fragments :: footer}"></div>
-	
+
 
 </body>
+
 </html>

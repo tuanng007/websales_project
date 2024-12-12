@@ -1,7 +1,10 @@
 package com.websales.common.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -18,66 +21,101 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "products")
-public class Product {
+public class Product extends IdBasedEntity{
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	@Column(length = 256, nullable = false, unique = true)
+	@Column(unique = true, length = 255, nullable = false)
 	private String name;
-	
-	@Column(length = 256, nullable = false, unique = true)
+
+	@Column(unique = true, length = 255, nullable = false)
 	private String alias;
-	
+
 	@Column(length = 512, nullable = false, name = "short_description")
 	private String shortDescription;
-	
+
 	@Column(length = 4096, nullable = false, name = "full_description")
 	private String fullDescription;
-	
-	@Column(name = "created_time")
+
+	@Column(name = "created_time", nullable = false, updatable = false)
 	private Date createdTime;
-	
+
 	@Column(name = "updated_time")
 	private Date updatedTime;
-	
+
 	private boolean enabled;
-	
+
 	@Column(name = "in_stock")
 	private boolean inStock;
-	
+
 	private float cost;
-	
+
 	private float price;
-	
+
 	@Column(name = "discount_percent")
 	private float discountPercent;
 	
 	private float length;
-	
 	private float width;
-	
 	private float height;
-	
 	private float weight;
 	
-	@Column(name="main_image", nullable = false)
-	private String mainImage;
+	private int reviewCount;
+	private float averageRating;
 	
+	@Column(name = "main_image", nullable = false)
+	private String mainImage;
+
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-	
+
 	@ManyToOne
-	@JoinColumn(name = "brand_id")
+	@JoinColumn(name = "brand_id")	
 	private Brand brand;
 	
-	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ProductImage> images = new HashSet<>();
 	
-	public Product() { }
-
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProductDetail> details = new ArrayList<>();
+	
+	@Transient 
+	private boolean customerCanReview;
+	
+	@Transient 
+	private boolean reviewedByCustomer;
+	
+	public Product() {
 		
+	}
+	
+	public Product(Integer id) {
+		this.id = id;
+	}
+	
+	public Product(String name) {
+		this.name = name;
+	}
+
+	public void addExtraImage(String imageName) {
+		this.images.add(new ProductImage(imageName, this));
+	}
+	
+	public void addDetail(String name, String value) {
+		this.details.add(new ProductDetail(name, value, this));
+	}
+	
+	
+	@Transient
+	public String getMainImagePath() {
+		if (id == null || mainImage == null) return "/images/image-thumbnail.png";
+
+		return "/product-images/" + this.id + "/" + this.mainImage;
+	}
+	
+	
 	
 	public Integer getId() {
 		return id;
@@ -207,6 +245,30 @@ public class Product {
 		this.weight = weight;
 	}
 
+	public int getReviewCount() {
+		return reviewCount;
+	}
+
+	public void setReviewCount(int reviewCount) {
+		this.reviewCount = reviewCount;
+	}
+
+	public float getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(float averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public String getMainImage() {
+		return mainImage;
+	}
+
+	public void setMainImage(String mainImage) {
+		this.mainImage = mainImage;
+	}
+
 	public Category getCategory() {
 		return category;
 	}
@@ -223,48 +285,80 @@ public class Product {
 		this.brand = brand;
 	}
 
-	
-
-	public String getMainImage() {
-		return mainImage;
-	}
-
-
-
-	public void setMainImage(String mainImage) {
-		this.mainImage = mainImage;
-	}
-
-	
-
 	public Set<ProductImage> getImages() {
 		return images;
 	}
-
-
 
 	public void setImages(Set<ProductImage> images) {
 		this.images = images;
 	}
 
-	public void addExtraImage(String imageName) { 
-		this.images.add(new ProductImage(imageName, this));
+	public List<ProductDetail> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<ProductDetail> details) {
+		this.details = details;
+	}
+
+	public boolean isCustomerCanReview() {
+		return customerCanReview;
+	}
+
+	public void setCustomerCanReview(boolean customerCanReview) {
+		this.customerCanReview = customerCanReview;
+	}
+
+	public boolean isReviewedByCustomer() {
+		return reviewedByCustomer;
+	}
+
+	public void setReviewedByCustomer(boolean reviewedByCustomer) {
+		this.reviewedByCustomer = reviewedByCustomer;
 	}
 
 	@Override
 	public String toString() {
-		return "Product [id=" + id + ", name=" + name + ", alias=" + alias + ", shortDescription=" + shortDescription
-				+ ", fullDescription=" + fullDescription + ", createdTime=" + createdTime + ", updatedTime="
-				+ updatedTime + ", enabled=" + enabled + ", inStock=" + inStock + ", cost=" + cost + ", price=" + price
-				+ ", discountPercent=" + discountPercent + ", length=" + length + ", width=" + width + ", height="
-				+ height + ", weight=" + weight + ", category=" + category + ", brand=" + brand + "]";
+		return "Product [id=" + id + ", name=" + name + "]";
+	}
+	
+	public void addDetail(Integer id, String name, String value) {
+		this.details.add(new ProductDetail(id, name, value, this));
+	}
+
+	public boolean containsImageName(String imageName) {
+		Iterator<ProductImage> iterator = images.iterator();
+
+		while (iterator.hasNext()) {
+			ProductImage image = iterator.next();
+			if (image.getName().equals(imageName)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	
+	@Transient
+	public String getShortName() {
+		if (name.length() > 70) {
+			return name.substring(0, 70).concat("...");
+		}
+		return name;
 	}
 	
 	@Transient
-	public String getMainImagePath() { 
-		if (id == null || id == 0)  { return "";}
-		
-		return  "/product-images/" + this.id + "/" + this.mainImage;
+	public float getDiscountPrice() {
+		if (discountPercent > 0) {
+			return price * ((100 - discountPercent) / 100);
+		}
+		return this.price;
+	}
+	
+	@Transient
+	public String getURI() {
+		return "/p/" + this.alias + "/";
 	}
 	
 }

@@ -1,61 +1,57 @@
+/**
+ * 
+ */
 $(document).ready(function() {
-	$("#buttonCancel").on("click", function() { 
+	$("#buttonCancel").on("click", function() {
 		window.location = moduleURL;
-	});	
-	
-	$("#fileImage").on("change", function() {
-		if(!checkFileSize(this)) { 
+	});
+
+	$("#fileImage").change(function() {
+		if (!checkFileSize(this)) {
 			return;
 		}
-		
+
 		showImageThumbnail(this);
-		
+
 	});
 });
 
-
-function checkFileSize(fileInput) { 
+function checkFileSize(fileInput) {
 	fileSize = fileInput.files[0].size;
-	
-	if(fileSize > MAX_FILE_SIZE){
+
+	if (fileSize > MAX_FILE_SIZE) {
 		fileInput.setCustomValidity("You must choose an image less than " + MAX_FILE_SIZE + " bytes!");
 		fileInput.reportValidity();
-		
+
 		return false;
-	} else  { 
+	} else {
 		fileInput.setCustomValidity("");
-		return true;		
-	}
+
+		return true;
+	}	
 }
-	
-function showModalDialog(title, message) {
-	$("#modalTitle").text(title);
-	$("#modalBody").text(message);
-	 var myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
-     myModal.show();
-}
+
 
 function showImageThumbnail(fileInput) {
 	var file = fileInput.files[0];
 	var reader = new FileReader();
-	reader.onload = function(e) { 
+	reader.onload = function(e) {
 		$("#thumbnail").attr("src", e.target.result);
 	};
+
 	reader.readAsDataURL(file);
+} 
+
+function showModalDialog(title, message) {
+	$("#modalTitle").text(title);
+	$("#modalBody").text(message);
+	$("#modalDialog").modal();
 }
 
-$(document).ready(function(){
-	$(".link-delete").on("click", function(e){
-		e.preventDefault();
-		link = $(this);
-		entityName = link.attr("entityName");
-		entityID= link.attr("entityID"); 		
-		$("#yesButton").attr("href", link.attr("href"));
-		$("#modalBody").text("Are you sure you want to delete this " + entityName + " ID " + entityID + " ?");
-		let myModal = new bootstrap.Modal(document.getElementById('modalDialog'));
-		myModal.show();
-	});
-});
+function showErrorModal(message) {
+	showModalDialog("Error", message);
+}
 
-
-	
+function showWarningModal(message) {
+	showModalDialog("Warning", message);
+}

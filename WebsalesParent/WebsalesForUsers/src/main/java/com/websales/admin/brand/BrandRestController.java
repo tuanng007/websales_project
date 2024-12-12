@@ -21,7 +21,7 @@ public class BrandRestController {
 	@Autowired
 	private BrandService brandService;
 	
-	@PostMapping("/brands/check_name")
+	@PostMapping("/brands/check_unique")
 	public String checkUnique(@Param("id") Integer id, @Param("name") String name) {
 		return brandService.checkUnique(id, name);
 	} 

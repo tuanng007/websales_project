@@ -1,6 +1,7 @@
 package com.websales.common.entity;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -17,11 +18,8 @@ import jakarta.persistence.Transient;
 
 @Entity
 @Table(name ="users")
-public class User {
-	@Id
-	@Column(name="id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+public class User extends IdBasedEntity {
+
 	
 	@Column(length = 128, nullable = false, unique = true)
 	private String email;
@@ -126,6 +124,19 @@ public class User {
 	
 	public void addRole(Role role) {
 		this.roles.add(role);
+	}
+	
+	public boolean hasRole(String roleName) {
+		Iterator<Role> iterator = roles.iterator();
+
+		while (iterator.hasNext()) {
+			Role role = iterator.next();
+			if (role.getName().equals(roleName)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override

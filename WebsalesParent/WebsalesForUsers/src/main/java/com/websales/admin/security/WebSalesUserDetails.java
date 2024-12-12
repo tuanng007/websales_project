@@ -76,8 +76,20 @@ public class WebSalesUserDetails implements UserDetails {
 		this.user.setFirstName(firstName);
 	}
 	
+	public boolean hasRole(String roleName)  { 
+		return user.hasRole(roleName);
+	}
+	
 	public void setLastName(String lastName) {
 		this.user.setLastName(lastName);
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	

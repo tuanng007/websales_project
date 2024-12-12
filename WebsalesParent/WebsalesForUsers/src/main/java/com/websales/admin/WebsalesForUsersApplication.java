@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EntityScan({"com.websales.common.entity", "com.websales.admin.user"})
+@EntityScan(basePackages = {"com.websales.common.entity", "com.websales.admin"})
 public class WebsalesForUsersApplication {
 
 	public static void main(String[] args) {

@@ -24,7 +24,7 @@ public class BrandRepositoryTest {
 	
 	@Test
 	public void testCreateBrand() {
-		Brand brand = new Brand("HyperX", "default.png");
+		Brand brand = new Brand("HyperX");
 		Category category = new Category(4);
 		brand.getCategories().add(category);
 		
@@ -37,7 +37,7 @@ public class BrandRepositoryTest {
 	
 	@Test 
 	public void testCreateBrand2() {
-		Brand brand  = new Brand("Samsung", "ddd.png");
+		Brand brand  = new Brand("Samsung");
 		Category category = new Category(4);
 		brand.getCategories().add(category);
 		
@@ -49,7 +49,7 @@ public class BrandRepositoryTest {
 	
 	@Test
 	public void testCreatBrand3() { 
-		Brand brand = new Brand("Google Pixel", "google.png");
+		Brand brand = new Brand("Google Pixel");
 		Category category = new Category(1);
 		Category category2 = new Category(2);
 		
